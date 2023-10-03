@@ -1,7 +1,6 @@
 import React, { memo, useEffect, useMemo } from 'react';
 import { PortalProvider } from '@gorhom/portal';
 import Animated, { useSharedValue, useAnimatedReaction, runOnJS } from 'react-native-reanimated';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Components
 import { Backdrop } from '../backdrop';
@@ -88,15 +87,13 @@ const ProviderComponent = ({
   );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <InternalContext.Provider value={internalContextVariables}>
-        <PortalProvider>
-          {children}
-          <Backdrop />
-          <Menu />
-        </PortalProvider>
-      </InternalContext.Provider>
-    </GestureHandlerRootView>
+    <InternalContext.Provider value={internalContextVariables}>
+      <PortalProvider>
+        {children}
+        <Menu />
+        <Backdrop />
+      </PortalProvider>
+    </InternalContext.Provider>
   );
 };
 

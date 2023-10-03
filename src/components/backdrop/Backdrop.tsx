@@ -2,7 +2,6 @@ import React, { memo } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedGestureHandler,
-  useAnimatedProps,
   useAnimatedStyle,
   withDelay,
   withTiming,
@@ -12,15 +11,11 @@ import {
   TapGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler';
 
-// Components
-import { BlurView } from '@react-native-community/blur';
-
 // Utils
 import { styles } from './styles';
 import {
   CONTEXT_MENU_STATE,
   HOLD_ITEM_TRANSFORM_DURATION,
-  IS_IOS,
   WINDOW_HEIGHT,
 } from '../../constants';
 import {
@@ -29,9 +24,6 @@ import {
 } from './constants';
 import { useInternal } from '../../hooks';
 
-const AnimatedBlurView = IS_IOS
-  ? Animated.createAnimatedComponent(BlurView)
-  : Animated.View;
 
 type Context = {
   startPosition: {
@@ -82,24 +74,13 @@ const BackdropComponent = () => {
           );
 
     const opacityValueAnimation = () =>
-      withTiming(state.value === CONTEXT_MENU_STATE.ACTIVE ? 1 : 0, {
+      withTiming(state.value === CONTEXT_MENU_STATE.ACTIVE ? 0.4 : 0, {
         duration: HOLD_ITEM_TRANSFORM_DURATION,
       });
 
     return {
       top: topValueAnimation(),
       opacity: opacityValueAnimation(),
-    };
-  });
-
-  const animatedContainerProps = useAnimatedProps(() => {
-    return {
-      blurAmount: withTiming(
-        state.value === CONTEXT_MENU_STATE.ACTIVE ? 100 : 0,
-        {
-          duration: HOLD_ITEM_TRANSFORM_DURATION,
-        }
-      ),
     };
   });
 
@@ -114,17 +95,14 @@ const BackdropComponent = () => {
 
   return (
     <TapGestureHandler onHandlerStateChange={tapGestureEvent}>
-      <AnimatedBlurView
-        animatedProps={animatedContainerProps}
-        style={[styles.container, animatedContainerStyle]}
-      >
+      <Animated.View style={[styles.container, animatedContainerStyle]}>
         <Animated.View
           style={[
             { ...StyleSheet.absoluteFillObject },
             animatedInnerContainerStyle,
           ]}
         />
-      </AnimatedBlurView>
+      </Animated.View>
     </TapGestureHandler>
   );
 };

@@ -3,7 +3,6 @@ import { StyleSheet } from 'react-native';
 
 import Animated, {
   runOnJS,
-  useAnimatedProps,
   useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
@@ -16,7 +15,6 @@ import {
   calculateMenuHeight,
   menuAnimationAnchor,
 } from '../../utils/calculations';
-import { BlurView } from '@react-native-community/blur';
 
 import MenuItems from './MenuItems';
 
@@ -32,8 +30,6 @@ import { MenuItemProps } from './types';
 import { useInternal } from '../../hooks';
 import { deepEqual } from '../../utils/validations';
 import { leftOrRight } from './calculations';
-
-const AnimatedView = Animated.createAnimatedComponent(BlurView);
 
 const MenuListComponent = () => {
   const { state, theme, menuProps } = useInternal();
@@ -106,10 +102,6 @@ const MenuListComponent = () => {
     };
   }, [theme]);
 
-  const animatedProps = useAnimatedProps(() => {
-    return { tint: theme.value };
-  }, [theme]);
-
   const setter = (items: MenuItemProps[]) => {
     setItemList(items);
     prevList.value = items;
@@ -126,11 +118,7 @@ const MenuListComponent = () => {
   );
 
   return (
-    <AnimatedView
-      blurAmount={100}
-      // animatedProps={animatedProps}
-      style={[styles.menuContainer, messageStyles]}
-    >
+    <Animated.View style={[styles.menuContainer, messageStyles]}>
       <Animated.View
         style={[
           StyleSheet.absoluteFillObject,
@@ -140,7 +128,7 @@ const MenuListComponent = () => {
       >
         <MenuItems items={itemList} />
       </Animated.View>
-    </AnimatedView>
+    </Animated.View>
   );
 };
 
