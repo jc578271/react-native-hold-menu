@@ -3,6 +3,14 @@ import { MenuItemProps } from '../menu/types';
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
 
 export type HoldItemProps = {
+  children: React.ReactElement | React.ReactElement[];
+};
+
+export type HoldItemPortalProps = {
+  children: React.ReactElement | React.ReactElement[];
+};
+
+export type HoldItemProviderProps = {
   /**
    * List of context menu items.
    * @type MenuItemProps[]
