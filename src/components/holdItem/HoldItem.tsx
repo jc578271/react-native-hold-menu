@@ -10,11 +10,11 @@ import type { HoldItemProps } from './types';
 import { useHoldItem } from './context';
 //#endregion
 
-const HoldItemComponent = ({ children }: HoldItemProps) => {
+const HoldItemComponent = ({ children, containerStyles }: HoldItemProps) => {
   //#endregion
 
   //#region variables
-  const { containerStyles, isActive, itemScale, containerRef } = useHoldItem();
+  const { isActive, itemScale, containerRef } = useHoldItem();
 
   //#region animated styles & props
   const animatedContainerStyle = useAnimatedStyle(() => {
