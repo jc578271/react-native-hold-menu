@@ -4,16 +4,6 @@ import { TransformOriginAnchorPosition } from '../../utils/calculations';
 
 export type HoldItemProps = {
   children: React.ReactElement | React.ReactElement[];
-  /**
-   * HoldItem wrapper component styles.
-   * You may need for some examples like dynamic width or hight like message boxes.
-   * See Whatsapp example.
-   * @type ViewStyles
-   * @default {}
-   * @examples
-   * containerStyles={{ maxWidth: '80%' }}
-   */
-  containerStyles?: ViewStyle | ViewStyle[];
 };
 
 export type HoldItemPortalProps = {
@@ -70,6 +60,17 @@ export type HoldItemProviderProps = {
    * disableMove={true}
    */
   disableMove?: boolean;
+
+  /**
+   * HoldItem wrapper component styles.
+   * You may need for some examples like dynamic width or hight like message boxes.
+   * See Whatsapp example.
+   * @type ViewStyles
+   * @default {}
+   * @examples
+   * containerStyles={{ maxWidth: '80%' }}
+   */
+  containerStyles?: ViewStyle | ViewStyle[];
 
   /**
    * Theme for menu background and texts
