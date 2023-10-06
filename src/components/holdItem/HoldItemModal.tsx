@@ -219,7 +219,6 @@ export const HoldItemModal = memo(function HoldItemPortal({
     () => state.value,
     _state => {
       if (_state == CONTEXT_MENU_STATE.END) {
-        // console.log('ok');
         visible.value = false;
       }
     }
