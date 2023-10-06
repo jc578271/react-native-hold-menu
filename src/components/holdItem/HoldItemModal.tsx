@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Portal } from '@gorhom/portal';
 import Animated, {
   useAnimatedGestureHandler,
@@ -186,9 +186,6 @@ export const HoldItemModal = memo(function HoldItemPortal({
       'worklet';
       animatedActiveId.value = id;
       if (canCallActivateFunctions(isTap)) {
-        activateAnimation();
-        transformValue.value = calculateTransformValue();
-
         if (!isActive.value) {
           if (!isTap) {
             scaleHold();
@@ -198,7 +195,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
         }
       }
     },
-    [activateAnimation, calculateTransformValue, onCompletion]
+    [onCompletion]
   );
 
   const dismiss = useCallback(() => {
@@ -222,10 +219,24 @@ export const HoldItemModal = memo(function HoldItemPortal({
     () => state.value,
     _state => {
       if (_state == CONTEXT_MENU_STATE.END) {
-        console.log('ok');
+        // console.log('ok');
         visible.value = false;
       }
     }
+  );
+
+  useAnimatedReaction(
+    () => ({
+      itemRectHeight: itemRectHeight.value,
+      itemRectWidth: itemRectWidth.value,
+      itemRectY: itemRectY.value,
+      itemRectX: itemRectX.value,
+    }),
+    _ => {
+      activateAnimation();
+      transformValue.value = calculateTransformValue();
+    },
+    [activateAnimation, calculateTransformValue]
   );
 
   /* -------------------- STYLE ------------------------- */

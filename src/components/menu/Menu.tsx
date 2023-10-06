@@ -15,18 +15,18 @@ import {
   CONTEXT_MENU_STATE,
   SPRING_CONFIGURATION,
 } from '../../constants';
-import { TransformOriginAnchorPosition } from "../../utils/calculations";
-import { useHoldItem } from "../holdItem/context";
+import { TransformOriginAnchorPosition } from '../../utils/calculations';
+import { useHoldItem } from '../holdItem/context';
 
-interface MenuProps  {
+interface MenuProps {
   menuAnchorPosition?: TransformOriginAnchorPosition;
   children: any;
 }
 
 const MenuComponent = ({
   menuAnchorPosition = 'top-left',
-  children
-                       }: MenuProps) => {
+  children,
+}: MenuProps) => {
   const { state } = useInternal();
   const {
     itemRectX,
