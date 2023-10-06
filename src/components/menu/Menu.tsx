@@ -15,20 +15,37 @@ import {
   CONTEXT_MENU_STATE,
   SPRING_CONFIGURATION,
 } from '../../constants';
+import { TransformOriginAnchorPosition } from "../../utils/calculations";
+import { useHoldItem } from "../holdItem/context";
 
-const MenuComponent = () => {
-  const { state, menuProps } = useInternal();
+interface MenuProps  {
+  menuAnchorPosition?: TransformOriginAnchorPosition;
+  children: any;
+}
+
+const MenuComponent = ({
+  menuAnchorPosition = 'top-left',
+  children
+                       }: MenuProps) => {
+  const { state } = useInternal();
+  const {
+    itemRectX,
+    itemRectY,
+    itemRectHeight,
+    itemRectWidth,
+    transformValue,
+  } = useHoldItem();
 
   const wrapperStyles = useAnimatedStyle(() => {
-    const anchorPositionVertical = menuProps.value.anchorPosition.split('-')[0];
+    const anchorPositionVertical = menuAnchorPosition.split('-')[0];
 
     const top =
       anchorPositionVertical === 'top'
-        ? menuProps.value.itemHeight + menuProps.value.itemY + 8
-        : menuProps.value.itemY - 8;
-    const left = menuProps.value.itemX;
-    const width = menuProps.value.itemWidth;
-    const tY = menuProps.value.transformValue;
+        ? itemRectHeight.value + itemRectY.value + 8
+        : itemRectY.value - 8;
+    const left = itemRectX.value;
+    const width = itemRectWidth.value;
+    const tY = transformValue.value;
 
     return {
       top,
@@ -43,11 +60,11 @@ const MenuComponent = () => {
         },
       ],
     };
-  }, [menuProps]);
+  }, []);
 
   return (
     <Animated.View style={[styles.menuWrapper, wrapperStyles]}>
-      <MenuList />
+      <MenuList menuAnchorPosition={menuAnchorPosition}>{children}</MenuList>
     </Animated.View>
   );
 };

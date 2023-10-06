@@ -1,6 +1,3 @@
-import Animated from 'react-native-reanimated';
-
-import { MENU_WIDTH } from '../../constants';
 import {
   MENU_TEXT_DARK_COLOR,
   MENU_TEXT_DESTRUCTIVE_COLOR_DARK,
@@ -8,25 +5,23 @@ import {
   MENU_TEXT_LIGHT_COLOR,
   MENU_TITLE_COLOR,
 } from './constants';
-import type { MenuInternalProps } from './types';
+import { TransformOriginAnchorPosition } from '../../utils/calculations';
 
 export const leftOrRight = (
-  menuProps: Animated.SharedValue<MenuInternalProps>
+  menuAnchorPosition: TransformOriginAnchorPosition,
+  itemWidth: number,
+  menuWidth: number
 ) => {
   'worklet';
 
-  const anchorPositionHorizontal = menuProps.value.anchorPosition.split('-')[1];
-  const itemWidth = menuProps.value.itemWidth;
+  const anchorPositionHorizontal = menuAnchorPosition.split('-')[1];
 
   let leftPosition = 0;
   anchorPositionHorizontal === 'right'
-    ? (leftPosition = -MENU_WIDTH + itemWidth)
+    ? (leftPosition = -menuWidth + itemWidth)
     : anchorPositionHorizontal === 'left'
     ? (leftPosition = 0)
-    : (leftPosition =
-        -menuProps.value.itemWidth -
-        MENU_WIDTH / 2 +
-        menuProps.value.itemWidth / 2);
+    : (leftPosition = -itemWidth - menuWidth / 2 + itemWidth / 2);
 
   return leftPosition;
 };

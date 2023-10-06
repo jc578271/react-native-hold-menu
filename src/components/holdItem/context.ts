@@ -12,6 +12,7 @@ interface HoldItemContextType {
   transformValue:SharedValue<number>,
   transformOrigin:SharedValue<TransformOriginAnchorPosition>,
   menuHeight:SharedValue<number>,
+  menuWidth:SharedValue<number>,
   visible:SharedValue<boolean>,
   animatedActiveId: SharedValue<string|undefined>
 }

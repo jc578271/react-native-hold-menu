@@ -1,6 +1,5 @@
 import styleGuide from '../styleGuide';
 import {
-  MENU_WIDTH,
   MENU_TRANSFORM_ORIGIN_TOLERENCE,
   FONT_SCALE,
 } from '../constants';
@@ -36,21 +35,21 @@ export type TransformOriginAnchorPosition =
 export const menuAnimationAnchor = (
   anchorPoint: TransformOriginAnchorPosition,
   itemWidth: number,
-  itemLength: number,
-  itemsWithSeparatorLength: number
+  menuHeight: number,
+  menuWidth: number
 ) => {
   'worklet';
-  const MenuHeight = calculateMenuHeight(itemLength, itemsWithSeparatorLength);
+  // const MenuHeight = calculateMenuHeight(itemLength, itemsWithSeparatorLength);
   const splittetAnchorName: string[] = anchorPoint.split('-');
 
   const Center1 = itemWidth;
   const Center2 = 0;
 
-  const TyTop1 = -(MenuHeight / 2);
-  const TyTop2 = MenuHeight / 2;
+  const TyTop1 = -(menuHeight / 2);
+  const TyTop2 = menuHeight / 2;
 
-  const TxLeft1 = (MENU_WIDTH / 2) * -1;
-  const TxLeft2 = (MENU_WIDTH / 2) * 1;
+  const TxLeft1 = (menuWidth / 2) * -1;
+  const TxLeft2 = (menuWidth / 2) * 1;
 
   return {
     beginningTransformations: {

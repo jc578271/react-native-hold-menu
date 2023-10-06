@@ -1,6 +1,6 @@
 import { ViewStyle } from 'react-native';
-import { MenuItemProps } from '../menu/types';
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
+import { SharedValue } from "react-native-reanimated";
 
 export type HoldItemProps = {
   id: string;
@@ -20,6 +20,7 @@ export type HoldItemProps = {
 };
 
 export type HoldItemPortalProps = {
+  visible: SharedValue<boolean>;
   id: string;
   children: React.ReactElement | React.ReactElement[];
 
@@ -58,6 +59,7 @@ export type HoldItemPortalProps = {
    * bottom={true}
    */
   bottom?: boolean;
+  MenuElement: JSX.Element
 };
 
 export type GestureHandlerProps = {

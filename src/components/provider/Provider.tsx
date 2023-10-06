@@ -15,7 +15,6 @@ import { HoldMenuProviderProps } from './types';
 import { StateProps, Action } from './reducer';
 import { CONTEXT_MENU_STATE } from '../../constants';
 import { MenuInternalProps } from '../menu/types';
-import Menu from '../menu';
 import { HoldItemProvider } from '../holdItem/HoldItemProvider';
 
 export interface Store {

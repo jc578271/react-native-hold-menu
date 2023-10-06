@@ -20,6 +20,7 @@ export const HoldItemProvider = memo(function HoldItemProvider({
   );
   const visible = useSharedValue<boolean>(false);
   const menuHeight = useSharedValue<number>(0);
+  const menuWidth = useSharedValue<number>(0);
   const animatedActiveId = useSharedValue<string | undefined>(undefined);
 
   const returnValue = useMemo(
@@ -33,6 +34,7 @@ export const HoldItemProvider = memo(function HoldItemProvider({
       transformValue,
       transformOrigin,
       menuHeight,
+      menuWidth,
       visible,
       animatedActiveId,
     }),
