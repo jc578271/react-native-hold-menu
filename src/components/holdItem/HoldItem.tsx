@@ -5,6 +5,7 @@ import Animated, {
   useAnimatedRef,
   useAnimatedStyle,
   useDerivedValue,
+  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import {
@@ -48,11 +49,11 @@ const HoldItemComponent = ({
 
   //#region animated styles & props
   const animatedContainerStyle = useAnimatedStyle(() => {
-    // const animateOpacity = () =>
-    //   withTiming(1, { duration: 0 });
+    const animateOpacity = () =>
+      withDelay(HOLD_ITEM_TRANSFORM_DURATION, withTiming(1, { duration: 0 }));
 
     return {
-      opacity: isActive.value ? 0 : 1,
+      opacity: isActive.value ? 0 : animateOpacity(),
       transform: [
         {
           scale: isActive.value
