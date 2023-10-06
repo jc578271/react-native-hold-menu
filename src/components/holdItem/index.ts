@@ -1,2 +1,3 @@
-export { default } from './HoldItem';
-export type { HoldItemProps } from './types';
+export * from './HoldItem';
+export * from './HoldItemModal';
+export type { HoldItemProps, HoldItemPortalProps } from './types';
