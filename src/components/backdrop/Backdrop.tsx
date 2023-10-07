@@ -29,10 +29,10 @@ type Context = {
 
 interface BackdropProps {
   state: SharedValue<CONTEXT_MENU_STATE>;
-  backDropOpacity?: number;
+  backdropOpacity?: number;
 }
 
-const BackdropComponent = ({ state, backDropOpacity }: BackdropProps) => {
+const BackdropComponent = ({ state, backdropOpacity }: BackdropProps) => {
   const tapGestureEvent = useAnimatedGestureHandler<
     TapGestureHandlerGestureEvent,
     Context
@@ -85,9 +85,9 @@ const BackdropComponent = ({ state, backDropOpacity }: BackdropProps) => {
   const backdropStyle = useMemo(
     () => ({
       backgroundColor: 'black',
-      opacity: backDropOpacity,
+      opacity: backdropOpacity,
     }),
-    [backDropOpacity]
+    [backdropOpacity]
   );
 
   return (

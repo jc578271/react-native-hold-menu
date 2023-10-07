@@ -51,7 +51,7 @@ export type HoldItemProps = {
    */
   style?: ViewStyle | ViewStyle[];
   isTap?: boolean;
-  backDropOpacity?: number;
+  backdropOpacity?: number;
   CustomModalElement?: JSX.Element | null
 };
 

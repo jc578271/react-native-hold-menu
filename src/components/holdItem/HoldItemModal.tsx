@@ -37,7 +37,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
     disableMove,
     menuAnchorPosition,
     MenuElement,
-    backDropOpacity,
+    backdropOpacity,
   } = useHoldItem();
 
   const key = useMemo(() => `hold-item-${nanoid()}`, []);
@@ -121,7 +121,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
             </Animated.View>
           </View>
         </Menu>
-        <Backdrop backDropOpacity={backDropOpacity} state={state} />
+        <Backdrop backdropOpacity={backdropOpacity} state={state} />
       </Portal>
     </View>
   );
