@@ -85,11 +85,11 @@ export const HoldItemModal = memo(function HoldItemPortal({
         },
       ],
     };
-  });
+  }, [calculateTransformValue, disableMove]);
 
   const animatedPortalProps = useAnimatedProps<ViewProps>(() => ({
     pointerEvents: isActive.value ? 'auto' : 'none',
-  }));
+  }), []);
 
   const portalContainerStyle = useMemo(
     () => [styles.holdItem, animatedPortalStyle],

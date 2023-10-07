@@ -126,6 +126,8 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
         bottom
       );
       transformOrigin.value = position;
+    } else {
+      transformOrigin.value = menuAnchorPosition || 'top-left';
     }
   }, [menuAnchorPosition, bottom, deviceOrientation]);
 
