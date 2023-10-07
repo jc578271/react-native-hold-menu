@@ -52,7 +52,6 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
   const itemRectWidth = useSharedValue<number>(0);
   const itemRectHeight = useSharedValue<number>(0);
   const itemScale = useSharedValue<number>(1);
-  const transformValue = useSharedValue<number>(0);
 
   const transformOrigin = useSharedValue<TransformOriginAnchorPosition>(
     menuAnchorPosition || 'top-left'
@@ -195,7 +194,6 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
       'worklet';
       if (canCallActivateFunctions(isTap)) {
         activateAnimation();
-        transformValue.value = calculateTransformValue();
         if (!isActive.value) {
           if (!isTap) {
             scaleHold();
@@ -273,7 +271,6 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
       itemRectWidth,
       itemRectHeight,
       itemScale,
-      transformValue,
       transformOrigin,
       menuHeight,
       menuWidth,

@@ -38,7 +38,6 @@ const _HoldItemModal = memo(function _HoldItemPortal({
     itemRectWidth,
     itemRectHeight,
     itemScale,
-    transformValue,
     menuHeight,
     menuWidth,
     calculateTransformValue,
@@ -113,16 +112,17 @@ const _HoldItemModal = memo(function _HoldItemPortal({
           itemRectY={itemRectY}
           itemRectHeight={itemRectHeight}
           itemRectWidth={itemRectWidth}
-          transformValue={transformValue}
           menuHeight={menuHeight}
           menuWidth={menuWidth}
+          calculateTransformValue={calculateTransformValue}
           menuAnchorPosition={menuAnchorPosition || 'top-left'}
         >
           <View style={_styles.outside} pointerEvents={'box-none'}>
             <Animated.View
               onLayout={e => {
-                menuHeight.value = e.nativeEvent.layout.height;
-                menuWidth.value = e.nativeEvent.layout.width;
+                const { height, width } = e.nativeEvent.layout;
+                menuHeight.value = height;
+                menuWidth.value = width;
               }}
             >
               {MenuElement}

@@ -25,9 +25,9 @@ export interface MenuProps {
   itemRectX: SharedValue<number>;
   itemRectWidth: SharedValue<number>;
   itemRectHeight: SharedValue<number>;
-  transformValue: SharedValue<number>;
   menuHeight: SharedValue<number>;
   menuWidth: SharedValue<number>;
+  calculateTransformValue: () => number;
 }
 
 const MenuComponent = ({ children, ...rest }: MenuProps) => {
@@ -38,7 +38,7 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
     itemRectY,
     itemRectHeight,
     itemRectWidth,
-    transformValue,
+    calculateTransformValue
   } = rest;
 
   const wrapperStyles = useAnimatedStyle(() => {
@@ -50,7 +50,7 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
         : itemRectY.value - 8;
     const left = itemRectX.value;
     const width = itemRectWidth.value;
-    const tY = transformValue.value;
+    const tY = calculateTransformValue()
 
     return {
       top,
