@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   SharedValue,
@@ -72,25 +72,28 @@ const BackdropComponent = ({ state, backDropOpacity }: BackdropProps) => {
           );
 
     const opacityValueAnimation = () =>
-      withTiming(
-        state.value === CONTEXT_MENU_STATE.ACTIVE ? backDropOpacity || 0.6 : 0,
-        {
-          duration: HOLD_ITEM_TRANSFORM_DURATION,
-        }
-      );
+      withTiming(state.value === CONTEXT_MENU_STATE.ACTIVE ? 1 : 0, {
+        duration: HOLD_ITEM_TRANSFORM_DURATION,
+      });
 
     return {
       top: topValueAnimation(),
       opacity: opacityValueAnimation(),
     };
-  }, [backDropOpacity]);
+  }, []);
+
+  const backdropStyle = useMemo(
+    () => ({
+      backgroundColor: 'black',
+      opacity: backDropOpacity,
+    }),
+    [backDropOpacity]
+  );
 
   return (
     <TapGestureHandler onHandlerStateChange={tapGestureEvent}>
       <Animated.View style={[styles.container, animatedContainerStyle]}>
-        <View
-          style={[StyleSheet.absoluteFillObject, { backgroundColor: 'black' }]}
-        />
+        <View style={[StyleSheet.absoluteFillObject, backdropStyle]} />
       </Animated.View>
     </TapGestureHandler>
   );

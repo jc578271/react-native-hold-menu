@@ -33,12 +33,13 @@ import { HoldItemModal } from './HoldItemModal';
 const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
   const {
     visible,
-    containerStyles,
+    style,
     menuAnchorPosition,
     bottom,
     disableMove,
-    safeAreaInsets= {top: 10, left: 0, right: 0, bottom: 50},
-    isTap
+    safeAreaInsets = { top: 10, left: 0, right: 0, bottom: 50 },
+    isTap,
+    CustomModalElement,
   } = props;
 
   //#region hooks
@@ -232,10 +233,10 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
     };
   }, []);
 
-  const containerStyle = React.useMemo(
-    () => [containerStyles, animatedContainerStyle],
-    [containerStyles, animatedContainerStyle]
-  );
+  const containerStyle = React.useMemo(() => [style, animatedContainerStyle], [
+    style,
+    animatedContainerStyle,
+  ]);
   //#endregion
 
   //#region animated effects
@@ -287,7 +288,9 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
     <HoldItemContext.Provider value={returnValue}>
       <Animated.View ref={containerRef} style={containerStyle}>
         {children}
-        <HoldItemModal>{children}</HoldItemModal>
+        <HoldItemModal>
+          {CustomModalElement !== undefined ? CustomModalElement : children}
+        </HoldItemModal>
       </Animated.View>
     </HoldItemContext.Provider>
   );

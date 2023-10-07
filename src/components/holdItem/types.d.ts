@@ -58,9 +58,10 @@ export type HoldItemProps = {
    * @examples
    * containerStyles={{ maxWidth: '80%' }}
    */
-  containerStyles?: ViewStyle | ViewStyle[];
+  style?: ViewStyle | ViewStyle[];
   isTap?: boolean;
   backDropOpacity?: number;
+  CustomModalElement?: JSX.Element | null
 };
 
 export type GestureHandlerProps = {
