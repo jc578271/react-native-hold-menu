@@ -81,7 +81,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
   });
 
   const animatedPortalProps = useAnimatedProps<ViewProps>(() => ({
-    pointerEvents: isActive.value ? 'auto' : 'none',
+    pointerEvents: isActive.value ? 'box-none' : 'none',
   }));
 
   const portalContainerStyle = useMemo(
