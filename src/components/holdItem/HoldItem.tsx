@@ -64,8 +64,7 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
 
   //#region variables
   const isActive = useDerivedValue(
-    () => state.value === CONTEXT_MENU_STATE.ACTIVE,
-    []
+    () => state.value === CONTEXT_MENU_STATE.ACTIVE
   );
 
   const deviceOrientation = useDeviceOrientation();
@@ -233,7 +232,7 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
         },
       ],
     };
-  }, []);
+  });
 
   const containerStyle = React.useMemo(() => [style, animatedContainerStyle], [
     style,

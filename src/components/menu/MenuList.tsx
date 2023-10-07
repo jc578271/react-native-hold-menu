@@ -68,7 +68,7 @@ const MenuListComponent = ({
         { translateY: translate.endingTransformations.translateY },
       ],
     };
-  }, [menuAnchorPosition]);
+  });
 
   return (
     <Animated.View style={[styles.menuContainer, messageStyles]}>

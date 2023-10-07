@@ -16,15 +16,6 @@ export type HoldItemProps = {
   disableMove?: boolean;
 
   /**
-   * Set true if you want to close menu when tap to HoldItem
-   * @type boolean
-   * @default false
-   * @examples
-   * closeOnTap={true}
-   */
-  closeOnTap?: boolean;
-
-  /**
    * Menu anchor position is calculated automaticly.
    * But you can override the calculation by passing an anchor position.
    * @type TransformOriginAnchorPosition

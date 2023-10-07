@@ -1,7 +1,6 @@
 import React, { memo, PropsWithChildren, useMemo } from 'react';
 import { Portal } from '@gorhom/portal';
 import Animated, {
-  useAnimatedGestureHandler,
   useAnimatedProps,
   useAnimatedStyle,
   useDerivedValue,
@@ -10,10 +9,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { nanoid } from 'nanoid/non-secure';
-import {
-  TapGestureHandler,
-  TapGestureHandlerGestureEvent,
-} from 'react-native-gesture-handler';
 import styles from './styles';
 import {
   CONTEXT_MENU_STATE,
@@ -40,7 +35,6 @@ export const HoldItemModal = memo(function HoldItemPortal({
     menuWidth,
     calculateTransformValue,
     disableMove,
-    closeOnTap,
     menuAnchorPosition,
     MenuElement,
     backDropOpacity,
@@ -49,8 +43,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
   const key = useMemo(() => `hold-item-${nanoid()}`, []);
 
   const isActive = useDerivedValue(
-    () => state.value === CONTEXT_MENU_STATE.ACTIVE,
-    []
+    () => state.value === CONTEXT_MENU_STATE.ACTIVE
   );
 
   /* -------------------- STYLE ------------------------- */
@@ -85,14 +78,11 @@ export const HoldItemModal = memo(function HoldItemPortal({
         },
       ],
     };
-  }, [calculateTransformValue, disableMove]);
+  });
 
-  const animatedPortalProps = useAnimatedProps<ViewProps>(
-    () => ({
-      pointerEvents: isActive.value ? 'auto' : 'none',
-    }),
-    []
-  );
+  const animatedPortalProps = useAnimatedProps<ViewProps>(() => ({
+    pointerEvents: isActive.value ? 'auto' : 'none',
+  }));
 
   const portalContainerStyle = useMemo(
     () => [styles.holdItem, animatedPortalStyle],
