@@ -1,7 +1,15 @@
-import React, { memo, PropsWithChildren, useMemo } from 'react';
+import React, {
+  memo,
+  PropsWithChildren,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { Portal } from '@gorhom/portal';
 import Animated, {
+  runOnJS,
   useAnimatedProps,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   withDelay,
@@ -20,7 +28,7 @@ import { useHoldItem } from './context';
 import Menu from '../menu';
 import { Backdrop } from '../backdrop';
 
-export const HoldItemModal = memo(function HoldItemPortal({
+const _HoldItemModal = memo(function _HoldItemPortal({
   children,
 }: PropsWithChildren<{}>) {
   const {
@@ -125,6 +133,40 @@ export const HoldItemModal = memo(function HoldItemPortal({
       </Portal>
     </View>
   );
+});
+
+export const HoldItemModal = memo(function HoldItemModal(
+  props: PropsWithChildren<{}>
+) {
+  const { state, visible } = useHoldItem();
+
+  const [mounted, setMount] = useState(visible.value);
+  const unMount = useCallback(() => {
+    setTimeout(() => {
+      setMount(false);
+    }, HOLD_ITEM_TRANSFORM_DURATION + 50);
+  }, []);
+
+  useAnimatedReaction(
+    () => ({
+      state: state.value,
+      visible: visible.value,
+    }),
+    (value, prev) => {
+      if (value.visible && prev?.visible !== value.visible) {
+        runOnJS(setMount)(true);
+      }
+      if (
+        value.state === CONTEXT_MENU_STATE.END &&
+        prev?.state !== value.state
+      ) {
+        runOnJS(unMount)();
+      }
+    },
+    []
+  );
+
+  return mounted ? <_HoldItemModal {...props} /> : null;
 });
 
 const _styles = StyleSheet.create({
