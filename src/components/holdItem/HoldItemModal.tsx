@@ -87,34 +87,17 @@ export const HoldItemModal = memo(function HoldItemPortal({
     };
   }, [calculateTransformValue, disableMove]);
 
-  const animatedPortalProps = useAnimatedProps<ViewProps>(() => ({
-    pointerEvents: isActive.value ? 'auto' : 'none',
-  }), []);
+  const animatedPortalProps = useAnimatedProps<ViewProps>(
+    () => ({
+      pointerEvents: isActive.value ? 'auto' : 'none',
+    }),
+    []
+  );
 
   const portalContainerStyle = useMemo(
     () => [styles.holdItem, animatedPortalStyle],
     [animatedPortalStyle]
   );
-
-  const overlayGestureEvent = useAnimatedGestureHandler<
-    TapGestureHandlerGestureEvent,
-    any
-  >({
-    onActive: _ => {
-      if (closeOnTap) state.value = CONTEXT_MENU_STATE.END;
-    },
-  });
-
-  const PortalOverlay = useMemo(() => {
-    return () => (
-      <TapGestureHandler
-        numberOfTaps={1}
-        onHandlerStateChange={overlayGestureEvent}
-      >
-        <Animated.View style={styles.portalOverlay} />
-      </TapGestureHandler>
-    );
-  }, [overlayGestureEvent]);
 
   return (
     <View style={_styles.portalWrapper}>
@@ -124,7 +107,6 @@ export const HoldItemModal = memo(function HoldItemPortal({
           style={portalContainerStyle}
           animatedProps={animatedPortalProps}
         >
-          <PortalOverlay />
           {children}
         </Animated.View>
         <Menu
