@@ -1,6 +1,6 @@
 import { ViewStyle } from 'react-native';
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
-import { SharedValue } from "react-native-reanimated";
+import { SharedValue } from 'react-native-reanimated';
 
 export type HoldItemProps = {
   visible: SharedValue<boolean>;
@@ -42,7 +42,7 @@ export type HoldItemProps = {
    */
   bottom?: boolean;
   MenuElement: JSX.Element;
-  safeAreaInsets: {
+  safeAreaInsets?: {
     top: number;
     right: number;
     bottom: number;

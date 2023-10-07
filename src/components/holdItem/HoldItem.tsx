@@ -37,7 +37,7 @@ const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
     menuAnchorPosition,
     bottom,
     disableMove,
-    safeAreaInsets,
+    safeAreaInsets= {top: 10, left: 0, right: 0, bottom: 50},
     isTap
   } = props;
 

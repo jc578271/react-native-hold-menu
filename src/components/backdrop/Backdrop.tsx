@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
+  SharedValue,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   withDelay,
@@ -18,7 +19,6 @@ import {
   HOLD_ITEM_TRANSFORM_DURATION,
   WINDOW_HEIGHT,
 } from '../../constants';
-import { useHoldItem } from '../holdItem/context';
 
 type Context = {
   startPosition: {
@@ -27,9 +27,12 @@ type Context = {
   };
 };
 
-const BackdropComponent = () => {
-  const { state, backDropOpacity } = useHoldItem();
+interface BackdropProps {
+  state: SharedValue<CONTEXT_MENU_STATE>;
+  backDropOpacity?: number;
+}
 
+const BackdropComponent = ({ state, backDropOpacity }: BackdropProps) => {
   const tapGestureEvent = useAnimatedGestureHandler<
     TapGestureHandlerGestureEvent,
     Context

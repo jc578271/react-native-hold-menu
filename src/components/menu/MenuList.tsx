@@ -7,10 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import {
-  menuAnimationAnchor,
-  TransformOriginAnchorPosition,
-} from '../../utils/calculations';
+import { menuAnimationAnchor } from '../../utils/calculations';
 
 import {
   CONTEXT_MENU_STATE,
@@ -19,19 +16,17 @@ import {
 } from '../../constants';
 
 import styles from './styles';
-import { useInternal } from '../../hooks';
 import { leftOrRight } from './calculations';
-import { useHoldItem } from '../holdItem/context';
+import { MenuProps } from './Menu';
 
 const MenuListComponent = ({
   menuAnchorPosition,
   children,
-}: {
-  menuAnchorPosition: TransformOriginAnchorPosition;
-  children: any;
-}) => {
-  const { state, itemRectWidth, menuHeight, menuWidth } = useHoldItem();
-
+  state,
+  itemRectWidth,
+  menuHeight,
+  menuWidth,
+}: MenuProps) => {
   const messageStyles = useAnimatedStyle(() => {
     const translate = menuAnimationAnchor(
       menuAnchorPosition,

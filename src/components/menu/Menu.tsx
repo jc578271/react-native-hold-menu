@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Animated, {
+  SharedValue,
   useAnimatedStyle,
   withSpring,
   withTiming,
@@ -9,32 +10,36 @@ import Animated, {
 import MenuList from './MenuList';
 
 import styles from './styles';
-import { useInternal } from '../../hooks';
 import {
   HOLD_ITEM_TRANSFORM_DURATION,
   CONTEXT_MENU_STATE,
   SPRING_CONFIGURATION,
 } from '../../constants';
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
-import { useHoldItem } from '../holdItem/context';
 
-interface MenuProps {
-  menuAnchorPosition?: TransformOriginAnchorPosition;
+export interface MenuProps {
+  menuAnchorPosition: TransformOriginAnchorPosition;
   children: any;
+  state: SharedValue<CONTEXT_MENU_STATE>;
+  itemRectY: SharedValue<number>;
+  itemRectX: SharedValue<number>;
+  itemRectWidth: SharedValue<number>;
+  itemRectHeight: SharedValue<number>;
+  transformValue: SharedValue<number>;
+  menuHeight: SharedValue<number>;
+  menuWidth: SharedValue<number>;
 }
 
-const MenuComponent = ({
-  menuAnchorPosition = 'top-left',
-  children,
-}: MenuProps) => {
+const MenuComponent = ({ children, ...rest }: MenuProps) => {
   const {
+    menuAnchorPosition,
     state,
     itemRectX,
     itemRectY,
     itemRectHeight,
     itemRectWidth,
     transformValue,
-  } = useHoldItem();
+  } = rest;
 
   const wrapperStyles = useAnimatedStyle(() => {
     const anchorPositionVertical = menuAnchorPosition.split('-')[0];
@@ -64,7 +69,7 @@ const MenuComponent = ({
 
   return (
     <Animated.View style={[styles.menuWrapper, wrapperStyles]}>
-      <MenuList menuAnchorPosition={menuAnchorPosition}>{children}</MenuList>
+      <MenuList {...rest}>{children}</MenuList>
     </Animated.View>
   );
 };

@@ -35,6 +35,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
     itemRectWidth,
     itemRectHeight,
     itemScale,
+    transformValue,
     menuHeight,
     menuWidth,
     calculateTransformValue,
@@ -42,6 +43,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
     closeOnTap,
     menuAnchorPosition,
     MenuElement,
+    backDropOpacity,
   } = useHoldItem();
 
   const key = useMemo(() => `hold-item-${nanoid()}`, []);
@@ -125,7 +127,17 @@ export const HoldItemModal = memo(function HoldItemPortal({
           <PortalOverlay />
           {children}
         </Animated.View>
-        <Menu menuAnchorPosition={menuAnchorPosition}>
+        <Menu
+          state={state}
+          itemRectX={itemRectX}
+          itemRectY={itemRectY}
+          itemRectHeight={itemRectHeight}
+          itemRectWidth={itemRectWidth}
+          transformValue={transformValue}
+          menuHeight={menuHeight}
+          menuWidth={menuWidth}
+          menuAnchorPosition={menuAnchorPosition || 'top-left'}
+        >
           <View style={_styles.outside} pointerEvents={'box-none'}>
             <Animated.View
               onLayout={e => {
@@ -137,7 +149,7 @@ export const HoldItemModal = memo(function HoldItemPortal({
             </Animated.View>
           </View>
         </Menu>
-        <Backdrop />
+        <Backdrop backDropOpacity={backDropOpacity} state={state} />
       </Portal>
     </View>
   );
