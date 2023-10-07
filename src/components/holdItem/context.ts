@@ -1,9 +1,10 @@
 import { createContext, useContext } from "react";
 import { SharedValue } from "react-native-reanimated";
 import { TransformOriginAnchorPosition } from "../../utils/calculations";
+import {CONTEXT_MENU_STATE} from "../../constants";
+import {HoldItemProps} from "react-native-hold-menu";
 
-interface HoldItemContextType {
-  currentId: SharedValue<string|undefined>;
+interface HoldItemContextType extends Omit<HoldItemProps, 'children'> {
   itemRectY:SharedValue<number>,
   itemRectX:SharedValue<number>,
   itemRectWidth:SharedValue<number>,
@@ -13,8 +14,8 @@ interface HoldItemContextType {
   transformOrigin:SharedValue<TransformOriginAnchorPosition>,
   menuHeight:SharedValue<number>,
   menuWidth:SharedValue<number>,
-  visible:SharedValue<boolean>,
-  animatedActiveId: SharedValue<string|undefined>
+  state: SharedValue<CONTEXT_MENU_STATE>;
+  calculateTransformValue: () => number;
 }
 
 //@ts-ignore

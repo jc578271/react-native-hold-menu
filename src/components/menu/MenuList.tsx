@@ -30,8 +30,7 @@ const MenuListComponent = ({
   menuAnchorPosition: TransformOriginAnchorPosition;
   children: any;
 }) => {
-  const { state } = useInternal();
-  const { itemRectWidth, menuHeight, menuWidth } = useHoldItem();
+  const { state, itemRectWidth, menuHeight, menuWidth } = useHoldItem();
 
   const messageStyles = useAnimatedStyle(() => {
     const translate = menuAnimationAnchor(

@@ -27,8 +27,8 @@ const MenuComponent = ({
   menuAnchorPosition = 'top-left',
   children,
 }: MenuProps) => {
-  const { state } = useInternal();
   const {
+    state,
     itemRectX,
     itemRectY,
     itemRectHeight,

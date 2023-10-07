@@ -1,19 +1,15 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, PropsWithChildren, useMemo } from 'react';
 import { Portal } from '@gorhom/portal';
 import Animated, {
   useAnimatedGestureHandler,
   useAnimatedProps,
-  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
-  useSharedValue,
   withDelay,
-  withSequence,
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { nanoid } from 'nanoid/non-secure';
-import { HoldItemPortalProps } from './types';
 import {
   TapGestureHandler,
   TapGestureHandlerGestureEvent,
@@ -21,221 +17,38 @@ import {
 import styles from './styles';
 import {
   CONTEXT_MENU_STATE,
-  HOLD_ITEM_SCALE_DOWN_DURATION,
-  HOLD_ITEM_SCALE_DOWN_VALUE,
   HOLD_ITEM_TRANSFORM_DURATION,
   SPRING_CONFIGURATION,
-  WINDOW_HEIGHT,
-  WINDOW_WIDTH,
 } from '../../constants';
 import { StyleSheet, View, ViewProps } from 'react-native';
-import { useDeviceOrientation, useInternal } from '../../hooks';
 import { useHoldItem } from './context';
-import { getTransformOrigin } from '../../utils/calculations';
-import styleGuide from '../../styleGuide';
 import Menu from '../menu';
-
-export interface HoldItemModal {
-  present: (isTap?: boolean) => void;
-  dismiss: () => void;
-}
+import { Backdrop } from '../backdrop';
 
 export const HoldItemModal = memo(function HoldItemPortal({
-  visible,
   children,
-  disableMove,
-  closeOnTap,
-  menuAnchorPosition,
-  id,
-  bottom,
-  MenuElement,
-}: HoldItemPortalProps) {
-  const { state, safeAreaInsets } = useInternal();
-
+}: PropsWithChildren<{}>) {
   const {
-    currentId,
+    state,
     itemRectY,
     itemRectX,
     itemRectWidth,
     itemRectHeight,
     itemScale,
     menuHeight,
-    transformValue,
-    transformOrigin,
-    animatedActiveId,
     menuWidth,
+    calculateTransformValue,
+    disableMove,
+    closeOnTap,
+    menuAnchorPosition,
+    MenuElement,
   } = useHoldItem();
 
-  const deviceOrientation = useDeviceOrientation();
-  const isAnimationStarted = useSharedValue(false);
   const key = useMemo(() => `hold-item-${nanoid()}`, []);
 
-  const isActive = useDerivedValue(() => currentId.value === id, [id]);
-
-  /* -----------------CALLBACK ---------------------------*/
-  //#region worklet functions
-  const activateAnimation = useCallback(() => {
-    'worklet';
-    if (!menuAnchorPosition) {
-      const position = getTransformOrigin(
-        itemRectX.value,
-        itemRectWidth.value,
-        deviceOrientation === 'portrait' ? WINDOW_WIDTH : WINDOW_HEIGHT,
-        bottom
-      );
-      transformOrigin.value = position;
-    }
-  }, [menuAnchorPosition, bottom, deviceOrientation]);
-
-  const calculateTransformValue = useCallback(() => {
-    'worklet';
-
-    const height =
-      deviceOrientation === 'portrait' ? WINDOW_HEIGHT : WINDOW_WIDTH;
-
-    const isAnchorPointTop = transformOrigin.value.includes('top');
-
-    let tY = 0;
-    if (!disableMove) {
-      if (isAnchorPointTop) {
-        const topTransform =
-          itemRectY.value +
-          itemRectHeight.value +
-          menuHeight.value +
-          styleGuide.spacing +
-          (safeAreaInsets?.bottom || 0);
-
-        tY = topTransform > height ? height - topTransform : 0;
-      } else {
-        const bottomTransform =
-          itemRectY.value - menuHeight.value - (safeAreaInsets?.top || 0);
-        tY =
-          bottomTransform < 0 ? -bottomTransform + styleGuide.spacing * 2 : 0;
-      }
-    }
-    return tY;
-  }, [safeAreaInsets, deviceOrientation, disableMove]);
-
-  const scaleBack = useCallback(() => {
-    'worklet';
-    itemScale.value = withTiming(1, {
-      duration: HOLD_ITEM_TRANSFORM_DURATION / 2,
-    });
-  }, []);
-
-  const onCompletion = useCallback(
-    (isFinised?: boolean) => {
-      'worklet';
-      if (isFinised) {
-        state.value = CONTEXT_MENU_STATE.ACTIVE;
-        // isActive.value = true;
-        currentId.value = id;
-        scaleBack();
-      }
-
-      isAnimationStarted.value = false;
-    },
-    [id]
-  );
-
-  const scaleHold = useCallback(() => {
-    'worklet';
-    itemScale.value = withTiming(
-      HOLD_ITEM_SCALE_DOWN_VALUE,
-      { duration: HOLD_ITEM_SCALE_DOWN_DURATION },
-      onCompletion
-    );
-  }, [onCompletion]);
-
-  const scaleTap = useCallback(() => {
-    'worklet';
-    isAnimationStarted.value = true;
-
-    itemScale.value = withSequence(
-      withTiming(HOLD_ITEM_SCALE_DOWN_VALUE, {
-        duration: HOLD_ITEM_SCALE_DOWN_DURATION,
-      }),
-      withTiming(
-        1,
-        {
-          duration: HOLD_ITEM_TRANSFORM_DURATION / 2,
-        },
-        onCompletion
-      )
-    );
-  }, [onCompletion]);
-
-  /**
-   * When use tap activation ("tap") and trying to tap multiple times,
-   * scale animation is called again despite it is started. This causes a bug.
-   * To prevent this, it is better to check is animation already started.
-   */
-  const canCallActivateFunctions = useCallback((isTap?: boolean) => {
-    'worklet';
-    const willActivateWithTap = isTap;
-
-    return (
-      (willActivateWithTap && !isAnimationStarted.value) || !willActivateWithTap
-    );
-  }, []);
-  //#endregion
-
-  /* PUBLIC METHOD */
-  const present = useCallback(
-    (isTap?: boolean) => {
-      'worklet';
-      animatedActiveId.value = id;
-      if (canCallActivateFunctions(isTap)) {
-        if (!isActive.value) {
-          if (!isTap) {
-            scaleHold();
-          } else {
-            scaleTap();
-          }
-        }
-      }
-    },
-    [onCompletion]
-  );
-
-  const dismiss = useCallback(() => {
-    'worklet';
-    state.value = CONTEXT_MENU_STATE.END;
-  }, []);
-
-  /*---------------------- REF ----------------------------*/
-  useAnimatedReaction(
-    () => visible.value,
-    _visible => {
-      if (_visible) {
-        present();
-      } else {
-        dismiss();
-      }
-    }
-  );
-
-  useAnimatedReaction(
-    () => state.value,
-    _state => {
-      if (_state == CONTEXT_MENU_STATE.END) {
-        visible.value = false;
-      }
-    }
-  );
-
-  useAnimatedReaction(
-    () => ({
-      itemRectHeight: itemRectHeight.value,
-      itemRectWidth: itemRectWidth.value,
-      itemRectY: itemRectY.value,
-      itemRectX: itemRectX.value,
-    }),
-    _ => {
-      activateAnimation();
-      transformValue.value = calculateTransformValue();
-    },
-    [activateAnimation, calculateTransformValue]
+  const isActive = useDerivedValue(
+    () => state.value === CONTEXT_MENU_STATE.ACTIVE,
+    []
   );
 
   /* -------------------- STYLE ------------------------- */
@@ -302,28 +115,31 @@ export const HoldItemModal = memo(function HoldItemPortal({
   }, [overlayGestureEvent]);
 
   return (
-    <Portal key={key} name={key}>
-      <Animated.View
-        key={key}
-        style={portalContainerStyle}
-        animatedProps={animatedPortalProps}
-      >
-        <PortalOverlay />
-        {children}
-      </Animated.View>
-      <Menu menuAnchorPosition={menuAnchorPosition}>
-        <View style={_styles.outside} pointerEvents={'box-none'}>
-          <Animated.View
-            onLayout={e => {
-              menuHeight.value = e.nativeEvent.layout.height;
-              menuWidth.value = e.nativeEvent.layout.width;
-            }}
-          >
-            {MenuElement}
-          </Animated.View>
-        </View>
-      </Menu>
-    </Portal>
+    <View style={_styles.portalWrapper}>
+      <Portal key={key} name={key}>
+        <Animated.View
+          key={key}
+          style={portalContainerStyle}
+          animatedProps={animatedPortalProps}
+        >
+          <PortalOverlay />
+          {children}
+        </Animated.View>
+        <Menu menuAnchorPosition={menuAnchorPosition}>
+          <View style={_styles.outside} pointerEvents={'box-none'}>
+            <Animated.View
+              onLayout={e => {
+                menuHeight.value = e.nativeEvent.layout.height;
+                menuWidth.value = e.nativeEvent.layout.width;
+              }}
+            >
+              {MenuElement}
+            </Animated.View>
+          </View>
+        </Menu>
+        <Backdrop />
+      </Portal>
+    </View>
   );
 });
 
@@ -334,5 +150,8 @@ const _styles = StyleSheet.create({
     backgroundColor: 'blue',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  portalWrapper: {
+    position: 'absolute',
   },
 });
