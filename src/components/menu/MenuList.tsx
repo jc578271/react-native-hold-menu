@@ -10,7 +10,6 @@ import Animated, {
 import { menuAnimationAnchor } from '../../utils/calculations';
 
 import {
-  CONTEXT_MENU_STATE,
   HOLD_ITEM_TRANSFORM_DURATION,
   SPRING_CONFIGURATION_MENU,
 } from '../../constants';
@@ -22,7 +21,6 @@ import { MenuProps } from './Menu';
 const MenuListComponent = ({
   menuAnchorPosition,
   children,
-  state,
   currentId,
   name,
   itemRectWidth,

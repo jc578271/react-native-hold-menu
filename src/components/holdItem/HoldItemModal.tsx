@@ -302,6 +302,7 @@ export const HoldItemModal = memo(function HoldItemModal(
   const present = useCallback(
     (isTap?: boolean) => {
       'worklet';
+      activeId.value = name;
       if (canCallActivateFunctions(isTap)) {
         activateAnimation();
         if (!isActive.value) {
@@ -313,7 +314,7 @@ export const HoldItemModal = memo(function HoldItemModal(
         }
       }
     },
-    [onCompletion, activateAnimation]
+    [onCompletion, activateAnimation, name]
   );
 
   const dismiss = useCallback(() => {
@@ -358,7 +359,7 @@ export const HoldItemModal = memo(function HoldItemModal(
         runOnJS(unMount)();
       }
     },
-    []
+    [name]
   );
 
   return mounted ? (
