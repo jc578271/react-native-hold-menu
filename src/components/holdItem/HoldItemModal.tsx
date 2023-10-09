@@ -277,15 +277,17 @@ export const HoldItemModal = memo(
     /* ------- PUBLIC METHOD ----------*/
     const present = useCallback(
       (isTap?: boolean) => {
-        _ref.current?.present(isTap);
         setMount(true);
+        InteractionManager.runAfterInteractions(() =>
+          _ref.current?.present(isTap)
+        );
       },
       [_ref.current?.present]
     );
 
     const dismiss = useCallback(() => {
       _ref.current?.dismiss();
-      unmount();
+      InteractionManager.runAfterInteractions(() => unmount());
     }, [unmount]);
 
     useImperativeHandle(ref, () => ({
@@ -293,13 +295,18 @@ export const HoldItemModal = memo(
       dismiss,
     }));
 
+    /* ---------ON UNMOUNT WHEN CURRENT ID IS UNDEFINED---------------*/
+    const jsUnmount = useCallback(() => {
+      InteractionManager.runAfterInteractions(() => unmount());
+    }, [unmount]);
+
     useAnimatedReaction(
       () => currentId.value,
       (currentId, prevId) => {
         if (prevId === null) return;
         if (currentId === undefined) {
           activeId.value = undefined;
-          runOnJS(unmount)();
+          runOnJS(jsUnmount)();
         }
       },
       [unmount]
@@ -322,6 +329,7 @@ export const HoldItemModal = memo(
     return mount ? (
       <_HoldItemModal
         {...props}
+        ref={_ref}
         handleOnUpdate={handlePortalRender}
         handleOnMount={handlePortalRender}
         handleOnUnmount={handlePortalOnUnmount}
