@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 import { SharedValue } from 'react-native-reanimated';
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
 import { CONTEXT_MENU_STATE } from '../../constants';
-import { HoldItemProps } from 'react-native-hold-menu';
+import { HoldItemProps } from '../holdItem/types';
 
 interface HoldItemContextType extends Omit<HoldItemProps, 'children'> {
   itemRectY: SharedValue<number>;
