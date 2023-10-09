@@ -14,11 +14,7 @@ import {
 
 // Utils
 import { styles } from './styles';
-import {
-  CONTEXT_MENU_STATE,
-  HOLD_ITEM_TRANSFORM_DURATION,
-  WINDOW_HEIGHT,
-} from '../../constants';
+import { HOLD_ITEM_TRANSFORM_DURATION, WINDOW_HEIGHT } from '../../constants';
 
 type Context = {
   startPosition: {
@@ -28,41 +24,43 @@ type Context = {
 };
 
 interface BackdropProps {
-  state: SharedValue<CONTEXT_MENU_STATE>;
+  currentId: SharedValue<string | undefined>;
+  name: string;
   backdropOpacity?: number;
 }
 
-const BackdropComponent = ({ state, backdropOpacity }: BackdropProps) => {
+const BackdropComponent = ({
+  currentId,
+  name,
+  backdropOpacity,
+}: BackdropProps) => {
   const tapGestureEvent = useAnimatedGestureHandler<
     TapGestureHandlerGestureEvent,
     Context
-  >(
-    {
-      onStart: (event, context) => {
-        context.startPosition = { x: event.x, y: event.y };
-      },
-      onCancel: () => {
-        state.value = CONTEXT_MENU_STATE.END;
-      },
-      onEnd: (event, context) => {
-        const distance = Math.hypot(
-          event.x - context.startPosition.x,
-          event.y - context.startPosition.y
-        );
-        const shouldClose = distance < 10;
-        const isStateActive = state.value === CONTEXT_MENU_STATE.ACTIVE;
-
-        if (shouldClose && isStateActive) {
-          state.value = CONTEXT_MENU_STATE.END;
-        }
-      },
+  >({
+    onStart: (event, context) => {
+      context.startPosition = { x: event.x, y: event.y };
     },
-    [state]
-  );
+    onCancel: () => {
+      currentId.value = undefined;
+    },
+    onEnd: (event, context) => {
+      const distance = Math.hypot(
+        event.x - context.startPosition.x,
+        event.y - context.startPosition.y
+      );
+      const shouldClose = distance < 10;
+      const isStateActive = currentId.value === name;
+
+      if (shouldClose && isStateActive) {
+        currentId.value = undefined;
+      }
+    },
+  });
 
   const animatedContainerStyle = useAnimatedStyle(() => {
     const topValueAnimation = () =>
-      state.value === CONTEXT_MENU_STATE.ACTIVE
+      currentId.value === name
         ? 0
         : withDelay(
             HOLD_ITEM_TRANSFORM_DURATION,
@@ -72,7 +70,7 @@ const BackdropComponent = ({ state, backdropOpacity }: BackdropProps) => {
           );
 
     const opacityValueAnimation = () =>
-      withTiming(state.value === CONTEXT_MENU_STATE.ACTIVE ? 1 : 0, {
+      withTiming(currentId.value === name ? 1 : 0, {
         duration: HOLD_ITEM_TRANSFORM_DURATION,
       });
 

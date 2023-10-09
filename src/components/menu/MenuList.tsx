@@ -23,6 +23,8 @@ const MenuListComponent = ({
   menuAnchorPosition,
   children,
   state,
+  currentId,
+  name,
   itemRectWidth,
   menuHeight,
   menuWidth,
@@ -42,14 +44,14 @@ const MenuListComponent = ({
     );
 
     const menuScaleAnimation = () =>
-      state.value === CONTEXT_MENU_STATE.ACTIVE
+      currentId.value === name
         ? withSpring(1, SPRING_CONFIGURATION_MENU)
         : withTiming(0, {
             duration: HOLD_ITEM_TRANSFORM_DURATION,
           });
 
     const opacityAnimation = () =>
-      withTiming(state.value === CONTEXT_MENU_STATE.ACTIVE ? 1 : 0, {
+      withTiming(currentId.value === name ? 1 : 0, {
         duration: HOLD_ITEM_TRANSFORM_DURATION,
       });
 

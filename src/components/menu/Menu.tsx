@@ -18,9 +18,10 @@ import {
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
 
 export interface MenuProps {
+  name: string;
   menuAnchorPosition: TransformOriginAnchorPosition;
   children: any;
-  state: SharedValue<CONTEXT_MENU_STATE>;
+  currentId: SharedValue<string | undefined>;
   itemRectY: SharedValue<number>;
   itemRectX: SharedValue<number>;
   itemRectWidth: SharedValue<number>;
@@ -32,13 +33,14 @@ export interface MenuProps {
 
 const MenuComponent = ({ children, ...rest }: MenuProps) => {
   const {
+    name,
     menuAnchorPosition,
-    state,
+    currentId,
     itemRectX,
     itemRectY,
     itemRectHeight,
     itemRectWidth,
-    calculateTransformValue
+    calculateTransformValue,
   } = rest;
 
   const wrapperStyles = useAnimatedStyle(() => {
@@ -50,7 +52,7 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
         : itemRectY.value - 8;
     const left = itemRectX.value;
     const width = itemRectWidth.value;
-    const tY = calculateTransformValue()
+    const tY = calculateTransformValue();
 
     return {
       top,
@@ -59,7 +61,7 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
       transform: [
         {
           translateY:
-            state.value === CONTEXT_MENU_STATE.ACTIVE
+            currentId.value === name
               ? withSpring(tY, SPRING_CONFIGURATION)
               : withTiming(0, { duration: HOLD_ITEM_TRANSFORM_DURATION }),
         },
