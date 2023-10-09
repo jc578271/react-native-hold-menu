@@ -20,12 +20,14 @@ import { leftOrRight } from './calculations';
 import { MenuProps } from './Menu';
 
 const MenuListComponent = ({
-  menuAnchorPosition,
+  menuAnchorPosition = 'top-left',
   children,
   state,
   itemRectWidth,
   menuHeight,
   menuWidth,
+  currentId,
+  id,
 }: MenuProps) => {
   const messageStyles = useAnimatedStyle(() => {
     const translate = menuAnimationAnchor(
@@ -41,15 +43,20 @@ const MenuListComponent = ({
       menuWidth.value
     );
 
+    const isActive =
+      id === undefined
+        ? state.value === CONTEXT_MENU_STATE.ACTIVE
+        : currentId.value === id;
+
     const menuScaleAnimation = () =>
-      state.value === CONTEXT_MENU_STATE.ACTIVE
+      isActive
         ? withSpring(1, SPRING_CONFIGURATION_MENU)
         : withTiming(0, {
             duration: HOLD_ITEM_TRANSFORM_DURATION,
           });
 
     const opacityAnimation = () =>
-      withTiming(state.value === CONTEXT_MENU_STATE.ACTIVE ? 1 : 0, {
+      withTiming(isActive ? 1 : 0, {
         duration: HOLD_ITEM_TRANSFORM_DURATION,
       });
 
@@ -71,8 +78,12 @@ const MenuListComponent = ({
   });
 
   return (
-    <Animated.View style={[styles.menuContainer, messageStyles]}>
+    <Animated.View
+      //@ts-ignore
+      style={[styles.menuContainer, messageStyles]}
+    >
       <Animated.View
+        //@ts-ignore
         style={[StyleSheet.absoluteFillObject, _styles.menuContent]}
       >
         {children}

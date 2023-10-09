@@ -1,7 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import Animated, {
   measure,
-  runOnJS,
   SharedValue,
   useAnimatedReaction,
   useAnimatedRef,
@@ -50,15 +49,8 @@ const HoldItemComponent = ({
 }: HoldItemProps) => {
   const { menuAnchorPosition, id } = modalProps;
 
-  const { setRenderChildren, currentId, ...internalValue } = useInternal();
-
-  const onRenderChildren = useCallback(() => {
-    setRenderChildren(children as any);
-  }, [children]);
-
-  const onRenderNull = useCallback(() => {
-    setRenderChildren(null);
-  }, []);
+  const { currentId, activeId, ...internalValue } = useInternal();
+  const { state, ...initValue } = useInitValue({ menuAnchorPosition });
 
   const {
     itemRectY,
@@ -69,16 +61,24 @@ const HoldItemComponent = ({
     transformOrigin,
     menuHeight,
     menuWidth,
-    state,
-  } = visible ? useInitValue({ menuAnchorPosition }) : internalValue;
+  } = visible ? initValue : internalValue;
+
+  const setActive = useCallback(() => {
+    'worklet';
+    if (visible) {
+      state.value = CONTEXT_MENU_STATE.ACTIVE;
+    } else {
+      if (id) {
+        currentId.value = id;
+      }
+    }
+  }, [id, visible]);
 
   //#region variables
-  const isActive = useDerivedValue(
-    () => {
-      if (visible) return state.value === CONTEXT_MENU_STATE.ACTIVE;
-      return currentId.value === id
-    }
-  );
+  const isActive = useDerivedValue(() => {
+    if (visible) return state.value === CONTEXT_MENU_STATE.ACTIVE;
+    return currentId.value === id;
+  });
 
   const deviceOrientation = useDeviceOrientation();
   const isAnimationStarted = useSharedValue(false);
@@ -123,12 +123,12 @@ const HoldItemComponent = ({
   const onCompletion = useCallback((isFinised?: boolean) => {
     'worklet';
     if (isFinised) {
-      state.value = CONTEXT_MENU_STATE.ACTIVE;
+      setActive();
       scaleBack();
     }
 
     isAnimationStarted.value = false;
-  }, []);
+  }, [id]);
 
   const scaleHold = useCallback(() => {
     'worklet';
@@ -176,7 +176,6 @@ const HoldItemComponent = ({
   const present = useCallback(
     (isTap?: boolean) => {
       'worklet';
-      if (!visible) runOnJS(onRenderChildren)();
       if (canCallActivateFunctions(isTap)) {
         activateAnimation();
         if (!isActive.value) {
@@ -193,8 +192,11 @@ const HoldItemComponent = ({
 
   const dismiss = useCallback(() => {
     'worklet';
-    if (!visible) runOnJS(onRenderNull)();
-    state.value = CONTEXT_MENU_STATE.END;
+    if (visible) {
+      state.value = CONTEXT_MENU_STATE.END;
+    } else {
+      currentId.value = '';
+    }
   }, [visible]);
   //#endregion
 
@@ -225,18 +227,19 @@ const HoldItemComponent = ({
   //#endregion
 
   //#region animated effects
-  useAnimatedReaction(
-    () => state.value,
-    _state => {
-      if (_state === CONTEXT_MENU_STATE.END) {
-        if (visible) visible.value = false;
-      }
-    },
-    []
-  );
   //#endregion
   /* trigger when visible changes */
-  if (visible)
+  if (visible) {
+    useAnimatedReaction(
+      () => state.value,
+      _state => {
+        if (_state === CONTEXT_MENU_STATE.END) {
+          if (visible) visible.value = false;
+        }
+      },
+      []
+    );
+
     useAnimatedReaction(
       () => visible.value,
       _visible => {
@@ -248,13 +251,24 @@ const HoldItemComponent = ({
       },
       [present, isTap, dismiss]
     );
+  }
 
-  /* trigger when currentId changes */
-  if (!visible)
+  /* trigger when active id changes */
+  if (!visible) {
     useAnimatedReaction(
       () => currentId.value,
       currentId => {
-        if (currentId === id) {
+        if (currentId === '') {
+          activeId.value = '';
+        }
+      },
+      [id]
+    );
+
+    useAnimatedReaction(
+      () => activeId.value,
+      activeId => {
+        if (activeId === id) {
           present(isTap);
         } else {
           dismiss();
@@ -262,6 +276,8 @@ const HoldItemComponent = ({
       },
       [id, present, isTap, dismiss]
     );
+  }
+
 
   //#endregion
   /* ----------------------PROVIDER --------------------------*/

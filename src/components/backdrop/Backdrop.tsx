@@ -1,9 +1,10 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   SharedValue,
   useAnimatedGestureHandler,
   useAnimatedStyle,
+  useDerivedValue,
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
@@ -29,40 +30,59 @@ type Context = {
 
 interface BackdropProps {
   state: SharedValue<CONTEXT_MENU_STATE>;
+  currentId: SharedValue<string>;
+  id?: string;
   backdropOpacity?: number;
 }
 
-const BackdropComponent = ({ state, backdropOpacity }: BackdropProps) => {
+const BackdropComponent = ({
+  state,
+  backdropOpacity,
+  currentId,
+  id,
+}: BackdropProps) => {
+  const isActive = useDerivedValue(() =>
+    id === undefined
+      ? state.value === CONTEXT_MENU_STATE.ACTIVE
+      : currentId.value === id
+  );
+
+  const onEnd = useCallback(() => {
+    'worklet';
+    if (id === undefined) {
+      state.value = CONTEXT_MENU_STATE.END;
+    } else {
+      currentId.value = '';
+    }
+  }, [id]);
+
   const tapGestureEvent = useAnimatedGestureHandler<
     TapGestureHandlerGestureEvent,
     Context
-  >(
-    {
-      onStart: (event, context) => {
-        context.startPosition = { x: event.x, y: event.y };
-      },
-      onCancel: () => {
-        state.value = CONTEXT_MENU_STATE.END;
-      },
-      onEnd: (event, context) => {
-        const distance = Math.hypot(
-          event.x - context.startPosition.x,
-          event.y - context.startPosition.y
-        );
-        const shouldClose = distance < 10;
-        const isStateActive = state.value === CONTEXT_MENU_STATE.ACTIVE;
-
-        if (shouldClose && isStateActive) {
-          state.value = CONTEXT_MENU_STATE.END;
-        }
-      },
+  >({
+    onStart: (event, context) => {
+      context.startPosition = { x: event.x, y: event.y };
     },
-    [state]
-  );
+    onCancel: () => {
+      onEnd();
+    },
+    onEnd: (event, context) => {
+      const distance = Math.hypot(
+        event.x - context.startPosition.x,
+        event.y - context.startPosition.y
+      );
+      const shouldClose = distance < 10;
+      const isStateActive = isActive.value;
+
+      if (shouldClose && isStateActive) {
+        onEnd();
+      }
+    },
+  });
 
   const animatedContainerStyle = useAnimatedStyle(() => {
     const topValueAnimation = () =>
-      state.value === CONTEXT_MENU_STATE.ACTIVE
+      isActive.value
         ? 0
         : withDelay(
             HOLD_ITEM_TRANSFORM_DURATION,
@@ -92,7 +112,10 @@ const BackdropComponent = ({ state, backdropOpacity }: BackdropProps) => {
 
   return (
     <TapGestureHandler onHandlerStateChange={tapGestureEvent}>
-      <Animated.View style={[styles.container, animatedContainerStyle]}>
+      <Animated.View
+        //@ts-ignore
+        style={[styles.container, animatedContainerStyle]}
+      >
         <View style={[StyleSheet.absoluteFillObject, backdropStyle]} />
       </Animated.View>
     </TapGestureHandler>

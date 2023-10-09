@@ -17,15 +17,19 @@ import {
 import { calculateTransformValue } from '../../utils/calculateTransformValue';
 import { useDeviceOrientation } from '../../hooks';
 import { HoldItemContextType } from '../holdItem/context';
-import {HoldItemPortalProps} from "../holdItem/HoldItemPortal";
+import { HoldItemPortalProps } from '../holdItem/HoldItemPortal';
+import { InternalContextType } from '../../context/internal';
 
 export type MenuProps = Omit<HoldItemPortalProps, 'MenuElement'> &
-  HoldItemContextType;
+  HoldItemContextType &
+  Omit<InternalContextType, 'activeId'>;
 
 const MenuComponent = ({ children, ...rest }: MenuProps) => {
   const {
+    id,
     menuAnchorPosition = 'top-left',
     state,
+    currentId,
     itemRectX,
     itemRectY,
     itemRectHeight,
@@ -62,10 +66,13 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
       width,
       transform: [
         {
-          translateY:
-            state.value === CONTEXT_MENU_STATE.ACTIVE
-              ? withSpring(tY, SPRING_CONFIGURATION)
-              : withTiming(0, { duration: HOLD_ITEM_TRANSFORM_DURATION }),
+          translateY: (
+            id === undefined
+              ? state.value === CONTEXT_MENU_STATE.ACTIVE
+              : currentId.value === id
+          )
+            ? withSpring(tY, SPRING_CONFIGURATION)
+            : withTiming(0, { duration: HOLD_ITEM_TRANSFORM_DURATION }),
         },
       ],
     };

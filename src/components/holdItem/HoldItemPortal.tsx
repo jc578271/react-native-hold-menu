@@ -33,6 +33,7 @@ export interface HoldItemPortalProps {
   MenuElement: JSX.Element;
   backdropOpacity?: number;
   safeAreaInsets?: { top: number; right: number; bottom: number; left: number };
+  visible?: SharedValue<boolean>;
 }
 
 export const HoldItemPortal = memo(function HoldItemPortal({
@@ -40,15 +41,13 @@ export const HoldItemPortal = memo(function HoldItemPortal({
   id,
   visible,
   ...props
-}: HoldItemPortalProps & { visible?: SharedValue<boolean> }) {
-  const { renderChildren, currentId } = useInternal();
-
+}: HoldItemPortalProps) {
   const { disableMove, MenuElement, backdropOpacity, safeAreaInsets } = props;
 
-  const holdItemValue = useHoldItem();
+  const { currentId, activeId, ...internalValue } = useInternal();
+  const { state, ...holdItemValue } = useHoldItem();
 
   const {
-    state,
     itemRectY,
     itemRectX,
     itemRectWidth,
@@ -57,24 +56,24 @@ export const HoldItemPortal = memo(function HoldItemPortal({
     menuHeight,
     menuWidth,
     transformOrigin,
-  } = holdItemValue;
+  } = id === undefined ? holdItemValue : internalValue;
 
   const key = useMemo(() => `hold-item-${nanoid()}`, []);
 
   const isActive = useDerivedValue(() => {
-    if (!visible) return state.value === CONTEXT_MENU_STATE.ACTIVE;
+    if (id === undefined) return state.value === CONTEXT_MENU_STATE.ACTIVE;
     return currentId.value === id;
   });
 
   /* change currentId when visible is triggered */
-  if (visible)
+  if (id !== undefined && visible)
     useAnimatedReaction(
       () => visible.value,
       visible => {
         if (visible) {
-          currentId.value = id;
+          activeId.value = id;
         } else {
-          currentId.value = undefined;
+          activeId.value = '';
         }
       },
       [id]
@@ -148,14 +147,24 @@ export const HoldItemPortal = memo(function HoldItemPortal({
           style={portalContainerStyle}
           animatedProps={animatedPortalProps}
         >
-          {renderChildren || children}
+          {children}
         </Animated.View>
-        <Menu {...props} {...holdItemValue}>
+        <Menu
+          {...props}
+          {...(id === undefined ? holdItemValue : internalValue)}
+          state={state}
+          currentId={currentId}
+        >
           <View style={_styles.outside} pointerEvents={'box-none'}>
             <Animated.View onLayout={onMenuLayout}>{MenuElement}</Animated.View>
           </View>
         </Menu>
-        <Backdrop backdropOpacity={backdropOpacity} state={state} />
+        <Backdrop
+          backdropOpacity={backdropOpacity}
+          id={id}
+          currentId={currentId}
+          state={state}
+        />
       </Portal>
     </View>
   );

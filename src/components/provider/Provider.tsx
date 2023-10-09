@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useMemo } from 'react';
 
 // Components
 // Utils
@@ -10,13 +10,10 @@ import { TransformOriginAnchorPosition } from '../../utils/calculations';
 
 const ProviderComponent = ({ children }: HoldMenuProviderProps) => {
   //#region hooks
-  const currentId = useSharedValue(undefined);
+  const currentId = useSharedValue('');
+  const activeId = useSharedValue('');
   const state = useSharedValue<CONTEXT_MENU_STATE>(
     CONTEXT_MENU_STATE.UNDETERMINED
-  );
-
-  const [renderChildren, setRenderChildren] = useState<JSX.Element | null>(
-    null
   );
 
   const itemRectY = useSharedValue<number>(0);
@@ -35,8 +32,7 @@ const ProviderComponent = ({ children }: HoldMenuProviderProps) => {
   const internalContextVariables = useMemo(
     () => ({
       currentId,
-      renderChildren,
-      setRenderChildren,
+      activeId,
       itemRectY,
       itemRectX,
       itemRectWidth,
