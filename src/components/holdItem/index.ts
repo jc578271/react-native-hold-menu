@@ -1,2 +1,2 @@
 export * from './HoldItem';
-export type { HoldItemProps } from './types';
+export * from './HoldItemPortal'

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import Animated, {
-  SharedValue,
   useAnimatedStyle,
   withSpring,
   withTiming,
@@ -15,31 +14,28 @@ import {
   CONTEXT_MENU_STATE,
   SPRING_CONFIGURATION,
 } from '../../constants';
-import { TransformOriginAnchorPosition } from '../../utils/calculations';
+import { calculateTransformValue } from '../../utils/calculateTransformValue';
+import { useDeviceOrientation } from '../../hooks';
+import { HoldItemContextType } from '../holdItem/context';
+import {HoldItemPortalProps} from "../holdItem/HoldItemPortal";
 
-export interface MenuProps {
-  menuAnchorPosition: TransformOriginAnchorPosition;
-  children: any;
-  state: SharedValue<CONTEXT_MENU_STATE>;
-  itemRectY: SharedValue<number>;
-  itemRectX: SharedValue<number>;
-  itemRectWidth: SharedValue<number>;
-  itemRectHeight: SharedValue<number>;
-  menuHeight: SharedValue<number>;
-  menuWidth: SharedValue<number>;
-  calculateTransformValue: () => number;
-}
+export type MenuProps = Omit<HoldItemPortalProps, 'MenuElement'> &
+  HoldItemContextType;
 
 const MenuComponent = ({ children, ...rest }: MenuProps) => {
   const {
-    menuAnchorPosition,
+    menuAnchorPosition = 'top-left',
     state,
     itemRectX,
     itemRectY,
     itemRectHeight,
     itemRectWidth,
-    calculateTransformValue
+    transformOrigin,
+    disableMove,
+    menuHeight,
+    safeAreaInsets,
   } = rest;
+  const deviceOrientation = useDeviceOrientation();
 
   const wrapperStyles = useAnimatedStyle(() => {
     const anchorPositionVertical = menuAnchorPosition.split('-')[0];
@@ -50,7 +46,15 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
         : itemRectY.value - 8;
     const left = itemRectX.value;
     const width = itemRectWidth.value;
-    const tY = calculateTransformValue()
+    const tY = calculateTransformValue({
+      deviceOrientation,
+      transformOrigin: transformOrigin.value,
+      disableMove,
+      itemRectY: itemRectY.value,
+      itemRectHeight: itemRectHeight.value,
+      menuHeight: menuHeight.value,
+      safeAreaInsets,
+    });
 
     return {
       top,
@@ -68,6 +72,7 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
   });
 
   return (
+    // @ts-ignore
     <Animated.View style={[styles.menuWrapper, wrapperStyles]}>
       <MenuList {...rest}>{children}</MenuList>
     </Animated.View>
