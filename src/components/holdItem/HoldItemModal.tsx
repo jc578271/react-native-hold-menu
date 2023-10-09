@@ -335,6 +335,16 @@ export const HoldItemModal = memo(function HoldItemModal(
     [isTap, present]
   );
 
+  useAnimatedReaction(
+    () => currentId.value,
+    currentId => {
+      if (currentId === undefined) {
+        visible.value = false;
+      }
+    },
+    []
+  );
+
   /* ----------------------MOUNT---------------------------*/
   const [mounted, setMount] = useState(false);
   const unMount = useCallback(() => {
