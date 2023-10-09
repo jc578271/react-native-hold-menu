@@ -23,7 +23,7 @@ import {
   HOLD_ITEM_TRANSFORM_DURATION,
   SPRING_CONFIGURATION,
 } from '../../constants';
-import { StyleSheet, View, ViewProps } from 'react-native';
+import { LayoutChangeEvent, StyleSheet, View, ViewProps } from 'react-native';
 import { useHoldItem } from './context';
 import Menu from '../menu';
 import { Backdrop } from '../backdrop';
@@ -96,6 +96,12 @@ const _HoldItemModal = memo(function _HoldItemPortal({
     [animatedPortalStyle]
   );
 
+  const onMenuLayout = useCallback((e: LayoutChangeEvent) => {
+    const { height, width } = e.nativeEvent.layout;
+    menuHeight.value = height;
+    menuWidth.value = width;
+  }, []);
+
   return (
     <View style={_styles.portalWrapper}>
       <Portal key={key} name={key}>
@@ -118,15 +124,7 @@ const _HoldItemModal = memo(function _HoldItemPortal({
           menuAnchorPosition={menuAnchorPosition || 'top-left'}
         >
           <View style={_styles.outside} pointerEvents={'box-none'}>
-            <Animated.View
-              onLayout={e => {
-                const { height, width } = e.nativeEvent.layout;
-                menuHeight.value = height;
-                menuWidth.value = width;
-              }}
-            >
-              {MenuElement}
-            </Animated.View>
+            <Animated.View onLayout={onMenuLayout}>{MenuElement}</Animated.View>
           </View>
         </Menu>
         <Backdrop backdropOpacity={backdropOpacity} state={state} />
