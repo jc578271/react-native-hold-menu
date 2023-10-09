@@ -12,7 +12,6 @@ import MenuList from './MenuList';
 import styles from './styles';
 import {
   HOLD_ITEM_TRANSFORM_DURATION,
-  CONTEXT_MENU_STATE,
   SPRING_CONFIGURATION,
 } from '../../constants';
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
