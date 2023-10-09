@@ -1,8 +1,6 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import Animated, {
   measure,
-  runOnJS,
-  SharedValue,
   useAnimatedReaction,
   useAnimatedRef,
   useAnimatedStyle,
@@ -21,63 +19,51 @@ import {
   WINDOW_WIDTH,
 } from '../../constants';
 
+import type { HoldItemProps } from './types';
 import { HoldItemContext } from './context';
-import { useDeviceOrientation, useInternal } from '../../hooks';
-import { getTransformOrigin } from '../../utils/calculations';
+import { useDeviceOrientation } from '../../hooks';
+import {
+  getTransformOrigin,
+  TransformOriginAnchorPosition,
+} from '../../utils/calculations';
+import styleGuide from '../../styleGuide';
 import { HoldItemModal } from './HoldItemModal';
-import { useInitValue } from '../../hooks/useInitValue';
-import { ViewStyle } from 'react-native';
-import { HoldItemPortalProps } from './HoldItemPortal';
 //#endregion
 
-export interface HoldItemProps extends HoldItemPortalProps {
-  visible?: SharedValue<boolean>;
-  children: React.ReactElement | React.ReactElement[];
-  style?: ViewStyle | ViewStyle[];
-  bottom?: boolean;
-  CustomModalElement?: JSX.Element | null;
-  isTap?: boolean;
-}
-
-const HoldItemComponent = ({
-  visible,
-  children,
-  style,
-  bottom,
-  CustomModalElement,
-  isTap,
-  ...modalProps
-}: HoldItemProps) => {
-  const { menuAnchorPosition, id } = modalProps;
-
-  const { setRenderChildren, currentId, ...internalValue } = useInternal();
-
-  const onRenderChildren = useCallback(() => {
-    setRenderChildren(children as any);
-  }, [children]);
-
-  const onRenderNull = useCallback(() => {
-    setRenderChildren(null);
-  }, []);
-
+const HoldItemComponent = ({ children, ...props }: HoldItemProps) => {
   const {
-    itemRectY,
-    itemRectX,
-    itemRectWidth,
-    itemRectHeight,
-    itemScale,
-    transformOrigin,
-    menuHeight,
-    menuWidth,
-    state,
-  } = visible ? useInitValue({ menuAnchorPosition }) : internalValue;
+    visible,
+    style,
+    menuAnchorPosition,
+    bottom,
+    disableMove,
+    safeAreaInsets = { top: 10, left: 0, right: 0, bottom: 50 },
+    isTap,
+    CustomModalElement,
+  } = props;
+
+  //#region hooks
+  const state = useSharedValue<CONTEXT_MENU_STATE>(
+    CONTEXT_MENU_STATE.UNDETERMINED
+  );
+
+  const itemRectY = useSharedValue<number>(0);
+  const itemRectX = useSharedValue<number>(0);
+  const itemRectWidth = useSharedValue<number>(0);
+  const itemRectHeight = useSharedValue<number>(0);
+  const itemScale = useSharedValue<number>(1);
+
+  const transformOrigin = useSharedValue<TransformOriginAnchorPosition>(
+    menuAnchorPosition || 'top-left'
+  );
+
+  const menuHeight = useSharedValue<number>(0);
+  const menuWidth = useSharedValue<number>(0);
+  //#endregion
 
   //#region variables
   const isActive = useDerivedValue(
-    () => {
-      if (visible) return state.value === CONTEXT_MENU_STATE.ACTIVE;
-      return currentId.value === id
-    }
+    () => state.value === CONTEXT_MENU_STATE.ACTIVE
   );
 
   const deviceOrientation = useDeviceOrientation();
@@ -89,6 +75,36 @@ const HoldItemComponent = ({
   //#endregion
 
   /* -----------------CALLBACK ---------------------------*/
+  //#region worklet functions
+  const calculateTransformValue = useCallback(() => {
+    'worklet';
+
+    const height =
+      deviceOrientation === 'portrait' ? WINDOW_HEIGHT : WINDOW_WIDTH;
+
+    const isAnchorPointTop = transformOrigin.value.includes('top');
+
+    let tY = 0;
+    if (!disableMove) {
+      if (isAnchorPointTop) {
+        const topTransform =
+          itemRectY.value +
+          itemRectHeight.value +
+          menuHeight.value +
+          styleGuide.spacing +
+          (safeAreaInsets?.bottom || 0);
+
+        tY = topTransform > height ? height - topTransform : 0;
+      } else {
+        const bottomTransform =
+          itemRectY.value - menuHeight.value - (safeAreaInsets?.top || 0);
+        tY =
+          bottomTransform < 0 ? -bottomTransform + styleGuide.spacing * 2 : 0;
+      }
+    }
+    return tY;
+  }, [safeAreaInsets, deviceOrientation, disableMove]);
+
   const activateAnimation = useCallback(() => {
     'worklet';
     const measured = measure(containerRef);
@@ -176,7 +192,6 @@ const HoldItemComponent = ({
   const present = useCallback(
     (isTap?: boolean) => {
       'worklet';
-      if (!visible) runOnJS(onRenderChildren)();
       if (canCallActivateFunctions(isTap)) {
         activateAnimation();
         if (!isActive.value) {
@@ -188,14 +203,13 @@ const HoldItemComponent = ({
         }
       }
     },
-    [onCompletion, activateAnimation, children, visible]
+    [onCompletion, activateAnimation, calculateTransformValue]
   );
 
   const dismiss = useCallback(() => {
     'worklet';
-    if (!visible) runOnJS(onRenderNull)();
     state.value = CONTEXT_MENU_STATE.END;
-  }, [visible]);
+  }, []);
   //#endregion
 
   //#region animated styles & props
@@ -229,39 +243,23 @@ const HoldItemComponent = ({
     () => state.value,
     _state => {
       if (_state === CONTEXT_MENU_STATE.END) {
-        if (visible) visible.value = false;
+        visible.value = false;
       }
     },
     []
   );
   //#endregion
-  /* trigger when visible changes */
-  if (visible)
-    useAnimatedReaction(
-      () => visible.value,
-      _visible => {
-        if (_visible) {
-          present(isTap);
-        } else {
-          dismiss();
-        }
-      },
-      [present, isTap, dismiss]
-    );
-
-  /* trigger when currentId changes */
-  if (!visible)
-    useAnimatedReaction(
-      () => currentId.value,
-      currentId => {
-        if (currentId === id) {
-          present(isTap);
-        } else {
-          dismiss();
-        }
-      },
-      [id, present, isTap, dismiss]
-    );
+  useAnimatedReaction(
+    () => visible.value,
+    _visible => {
+      if (_visible) {
+        present(isTap);
+      } else {
+        dismiss();
+      }
+    },
+    [present, isTap]
+  );
 
   //#endregion
   /* ----------------------PROVIDER --------------------------*/
@@ -277,24 +275,20 @@ const HoldItemComponent = ({
       menuHeight,
       menuWidth,
       state,
+      calculateTransformValue,
+      ...props,
     }),
-    []
+    [props]
   );
 
   //#region render
   return (
     <HoldItemContext.Provider value={returnValue}>
-      <Animated.View
-        ref={containerRef}
-        // @ts-ignore
-        style={containerStyle}
-      >
+      <Animated.View ref={containerRef} style={containerStyle}>
         {children}
-        {visible ? (
-          <HoldItemModal visible={visible} {...modalProps}>
-            {CustomModalElement !== undefined ? CustomModalElement : children}
-          </HoldItemModal>
-        ) : null}
+        <HoldItemModal>
+          {CustomModalElement !== undefined ? CustomModalElement : children}
+        </HoldItemModal>
       </Animated.View>
     </HoldItemContext.Provider>
   );

@@ -1,12 +1,15 @@
-import React, { createContext } from 'react';
-import { HoldItemContextType } from '../components/holdItem/context';
-import { SharedValue } from 'react-native-reanimated';
+import { createContext } from 'react';
 
-export interface InternalContextType extends HoldItemContextType {
-  currentId: SharedValue<string | undefined>;
-  setRenderChildren: React.Dispatch<React.SetStateAction<JSX.Element | null>>;
-  renderChildren: JSX.Element | null;
-}
+export type InternalContextType = {
+  // state: Animated.SharedValue<CONTEXT_MENU_STATE>;
+  // theme: Animated.SharedValue<'light' | 'dark'>;
+  // safeAreaInsets?: {
+  //   top: number;
+  //   right: number;
+  //   bottom: number;
+  //   left: number;
+  // };
+};
 
 // @ts-ignore
 export const InternalContext = createContext<InternalContextType>();
