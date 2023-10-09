@@ -3,6 +3,7 @@ import React, {
   memo,
   useCallback,
   useImperativeHandle,
+  useRef,
   useState,
 } from 'react';
 import {
@@ -28,6 +29,7 @@ import {
 } from '../../utils/calculations';
 import styleGuide from '../../styleGuide';
 import { HoldItemPortal } from './portal';
+import { InteractionManager } from 'react-native';
 
 export interface HoldItemModalProps {
   name: string;
@@ -53,18 +55,21 @@ export interface HoldItemModal {
   dismiss: () => void;
 }
 
-export const HoldItemModal = memo(
-  forwardRef<HoldItemModal, HoldItemModalProps>(function _HoldItemModal(
-    props,
-    ref
-  ) {
+const _HoldItemModal = memo(
+  forwardRef<
+    HoldItemModal,
+    HoldItemModalProps & {
+      handleOnMount?: (mount: () => void) => void;
+      handleOnUnmount?: (unmount: () => void) => void;
+      handleOnUpdate?: (update: () => void) => void;
+    }
+  >(function _HoldItemModal(props, ref) {
     const {
       name,
       disableMove,
       safeAreaInsets = { top: 0, left: 0, right: 0, bottom: 50 },
       menuAnchorPosition,
       bottom,
-      onDismiss,
     } = props;
     const {
       currentId,
@@ -192,7 +197,7 @@ export const HoldItemModal = memo(
     }, []);
     //#endregion
 
-    /* PUBLIC METHOD */
+    /* UI METHOD */
     const uiPresent = useCallback(
       (isTap?: boolean) => {
         'worklet';
@@ -216,21 +221,70 @@ export const HoldItemModal = memo(
       currentId.value = undefined;
     }, []);
     //#endregion
-    /* ----------------------REF -----------------------*/
-    const [mounted, setMount] = useState(false);
-    const unmount = useCallback(() => {
-      setTimeout(() => {
-        setMount(false);
-      }, HOLD_ITEM_TRANSFORM_DURATION + 50);
+    useImperativeHandle(ref, () => ({
+      present: runOnUI(uiPresent),
+      dismiss: runOnUI(uiDismiss),
+    }));
+
+    return (
+      <HoldItemPortal
+        {...props}
+        calculateTransformValue={calculateTransformValue}
+      />
+    );
+  })
+);
+
+export const HoldItemModal = memo(
+  forwardRef<HoldItemModal, HoldItemModalProps>(function HoldItemModal(
+    props,
+    ref
+  ) {
+    const { onDismiss } = props;
+    const { activeId, currentId } = useInternal();
+    const _ref = useRef<HoldItemModal>(null);
+
+    /* ----------------------MOUNT -----------------------*/
+    const [mount, setMount] = useState(false);
+    const mounted = useRef(false);
+    mounted.current = mount;
+
+    const resetVariables = useCallback(function resetVariables() {
+      mounted.current = false;
     }, []);
 
-    const present = useCallback((isTap?: boolean) => {
-      runOnUI(uiPresent)(isTap);
-      setMount(true);
-    }, [uiPresent]);
+    const unmount = useCallback(
+      function unmount() {
+        const _mounted = mounted.current;
+
+        // reset variables
+        resetVariables();
+
+        // unmount the node, if sheet is still mounted
+        if (_mounted) {
+          InteractionManager.runAfterInteractions(() =>
+            setTimeout(() => {
+              setMount(false);
+            }, HOLD_ITEM_TRANSFORM_DURATION + 50)
+          );
+        }
+
+        onDismiss?.();
+      },
+      [resetVariables, onDismiss]
+    );
+
+    /* ------- PUBLIC METHOD ----------*/
+    const present = useCallback(
+      (isTap?: boolean) => {
+        _ref.current?.present(isTap);
+        setMount(true);
+      },
+      [_ref.current?.present]
+    );
 
     const dismiss = useCallback(() => {
-      runOnUI(uiDismiss)();
+      _ref.current?.dismiss();
       unmount();
     }, [unmount]);
 
@@ -239,27 +293,38 @@ export const HoldItemModal = memo(
       dismiss,
     }));
 
-    const _onDismiss = useCallback(() => {
-      unmount();
-      onDismiss?.();
-    }, [onDismiss, unmount]);
-
     useAnimatedReaction(
       () => currentId.value,
       (currentId, prevId) => {
         if (prevId === null) return;
         if (currentId === undefined) {
           activeId.value = undefined;
-          runOnJS(_onDismiss)();
+          runOnJS(unmount)();
         }
       },
-      [_onDismiss]
+      [unmount]
     );
 
-    return mounted ? (
-      <HoldItemPortal
+    /* ------- HANDLE PORTAL ----------*/
+    const handlePortalOnUnmount = useCallback(function handlePortalOnUnmount() {
+      mounted.current = false;
+    }, []);
+
+    const handlePortalRender = useCallback(function handlePortalRender(
+      render: () => void
+    ) {
+      if (mounted.current) {
+        render();
+      }
+    },
+    []);
+
+    return mount ? (
+      <_HoldItemModal
         {...props}
-        calculateTransformValue={calculateTransformValue}
+        handleOnUpdate={handlePortalRender}
+        handleOnMount={handlePortalRender}
+        handleOnUnmount={handlePortalOnUnmount}
       />
     ) : null;
   })
