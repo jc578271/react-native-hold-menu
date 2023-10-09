@@ -19,9 +19,10 @@ const HoldItemComponent = ({
   children,
   name,
   style,
-  hasModal = true,
   ...modalProps
-}: HoldItemProps & HoldItemModalProps) => {
+}: HoldItemProps & Partial<HoldItemModalProps>) => {
+  const { visible, MenuElement } = modalProps;
+
   //#region hooks
   const {
     itemScale,
@@ -102,8 +103,13 @@ const HoldItemComponent = ({
   return (
     <Animated.View ref={containerRef} style={containerStyle}>
       {children}
-      {hasModal ? (
-        <HoldItemModal {...modalProps} name={name}>
+      {visible && MenuElement ? (
+        <HoldItemModal
+          {...modalProps}
+          name={name}
+          visible={visible}
+          MenuElement={MenuElement}
+        >
           {children}
         </HoldItemModal>
       ) : null}

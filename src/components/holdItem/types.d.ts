@@ -6,7 +6,6 @@ export type HoldItemProps = {
   name: string;
   children: React.ReactElement | React.ReactElement[];
   style?: ViewStyle | ViewStyle[];
-  hasModal?: boolean;
 };
 
 export type GestureHandlerProps = {
