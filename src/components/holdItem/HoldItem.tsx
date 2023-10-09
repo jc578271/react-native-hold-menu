@@ -46,10 +46,7 @@ const HoldItemComponent = ({
   //#region animated styles & props
   const animatedContainerStyle = useAnimatedStyle(() => {
     const animateOpacity = () =>
-      withDelay(
-        HOLD_ITEM_TRANSFORM_DURATION - 50,
-        withTiming(1, { duration: 0 })
-      );
+      withDelay(HOLD_ITEM_TRANSFORM_DURATION, withTiming(1, { duration: 0 }));
 
     return {
       opacity: isActive.value ? 0 : animateOpacity(),
