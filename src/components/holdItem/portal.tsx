@@ -1,6 +1,5 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { useInternal } from '../../hooks';
-import { nanoid } from 'nanoid/non-secure';
 import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
