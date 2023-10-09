@@ -268,8 +268,11 @@ export const HoldItemModal = memo(
             }, HOLD_ITEM_TRANSFORM_DURATION + 50)
           );
         }
-
-        onDismiss?.();
+        InteractionManager.runAfterInteractions(() => {
+          setTimeout(() => {
+            onDismiss?.();
+          }, HOLD_ITEM_TRANSFORM_DURATION + 50);
+        });
       },
       [resetVariables, onDismiss]
     );
