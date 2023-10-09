@@ -169,7 +169,7 @@ export const HoldItemModal = memo(function HoldItemModal(
     name,
     disableMove,
     isTap,
-    safeAreaInsets,
+    safeAreaInsets = { top: 0, left: 0, right: 0, bottom: 50 },
     menuAnchorPosition,
     bottom,
   } = props;
