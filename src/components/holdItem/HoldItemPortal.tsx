@@ -28,11 +28,11 @@ import { Backdrop } from '../backdrop';
 export interface HoldItemPortalProps {
   id?: string;
   children: any;
-  disableMove?: boolean;
+  disableMove: boolean | any;
   menuAnchorPosition?: TransformOriginAnchorPosition;
   MenuElement: JSX.Element;
   backdropOpacity?: number;
-  safeAreaInsets?: { top: number; right: number; bottom: number; left: number };
+  safeAreaInsets: { top: number; right: number; bottom: number; left: number };
 }
 
 export const HoldItemPortal = memo(function HoldItemPortal({

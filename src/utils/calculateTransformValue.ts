@@ -9,7 +9,7 @@ export const calculateTransformValue = ({
   itemRectY,
   itemRectHeight,
   menuHeight,
-  safeAreaInsets = {top: 0, left: 0, right: 0, bottom: 50},
+  safeAreaInsets,
 }: {
   deviceOrientation: 'landscape' | 'portrait';
   transformOrigin: TransformOriginAnchorPosition;
@@ -17,7 +17,7 @@ export const calculateTransformValue = ({
   itemRectY: number;
   itemRectHeight: number;
   menuHeight: number;
-  safeAreaInsets?: {
+  safeAreaInsets: {
     top: number;
     right: number;
     bottom: number;
