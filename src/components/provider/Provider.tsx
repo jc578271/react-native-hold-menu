@@ -1,5 +1,4 @@
 import React, { memo, useMemo } from 'react';
-import { PortalProvider } from '@gorhom/portal';
 
 // Components
 // Utils
@@ -44,7 +43,7 @@ const ProviderComponent = ({ children }: HoldMenuProviderProps) => {
 
   return (
     <InternalContext.Provider value={internalContextVariables}>
-      <PortalProvider>{children}</PortalProvider>
+      {children}
     </InternalContext.Provider>
   );
 };
