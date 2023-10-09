@@ -49,6 +49,4 @@ const ProviderComponent = ({ children }: HoldMenuProviderProps) => {
   );
 };
 
-const Provider = memo(ProviderComponent);
-
-export default Provider;
+export const HoldMenuProvider = memo(ProviderComponent);
