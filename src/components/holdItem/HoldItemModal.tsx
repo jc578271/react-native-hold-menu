@@ -1,37 +1,27 @@
-import React, { memo, useCallback, useMemo, useState } from 'react';
-import { Portal } from '@gorhom/portal';
-import Animated, {
+import React, { memo, useCallback, useState } from 'react';
+import {
   runOnJS,
   SharedValue,
-  useAnimatedProps,
   useAnimatedReaction,
-  useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
-  withDelay,
   withSequence,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { nanoid } from 'nanoid/non-secure';
-import styles from './styles';
 import {
   HOLD_ITEM_SCALE_DOWN_DURATION,
   HOLD_ITEM_SCALE_DOWN_VALUE,
   HOLD_ITEM_TRANSFORM_DURATION,
-  SPRING_CONFIGURATION,
   WINDOW_HEIGHT,
   WINDOW_WIDTH,
 } from '../../constants';
-import { LayoutChangeEvent, StyleSheet, View, ViewProps } from 'react-native';
-import Menu from '../menu';
-import { Backdrop } from '../backdrop';
 import { useDeviceOrientation, useInternal } from '../../hooks';
 import {
   getTransformOrigin,
   TransformOriginAnchorPosition,
 } from '../../utils/calculations';
 import styleGuide from '../../styleGuide';
+import { HoldItemPortal } from './portal';
 
 export interface HoldItemModalProps {
   visible: SharedValue<boolean>;
@@ -51,115 +41,6 @@ export interface HoldItemModalProps {
     left: number;
   };
 }
-
-const _HoldItemModal = memo(function _HoldItemPortal({
-  name,
-  children,
-  disableMove,
-  menuAnchorPosition,
-  MenuElement,
-  backdropOpacity,
-  calculateTransformValue,
-}: HoldItemModalProps & { calculateTransformValue: () => number }) {
-  const {
-    currentId,
-    itemRectY,
-    itemRectX,
-    itemRectWidth,
-    itemRectHeight,
-    itemScale,
-    menuHeight,
-    menuWidth,
-  } = useInternal();
-
-  const key = useMemo(() => `hold-item-${nanoid()}`, []);
-
-  const isActive = useDerivedValue(() => currentId.value === name);
-
-  /* -------------------- STYLE ------------------------- */
-  const animatedPortalStyle = useAnimatedStyle(() => {
-    const animateOpacity = () =>
-      withDelay(HOLD_ITEM_TRANSFORM_DURATION, withTiming(0, { duration: 0 }));
-
-    let tY = calculateTransformValue();
-    const transformAnimation = () =>
-      disableMove
-        ? 0
-        : isActive.value
-        ? withSpring(tY, SPRING_CONFIGURATION)
-        : withTiming(-0.1, { duration: HOLD_ITEM_TRANSFORM_DURATION });
-
-    return {
-      zIndex: 10,
-      position: 'absolute',
-      top: itemRectY.value,
-      left: itemRectX.value,
-      width: itemRectWidth.value,
-      height: itemRectHeight.value,
-      opacity: isActive.value ? 1 : animateOpacity(),
-      transform: [
-        {
-          translateY: transformAnimation(),
-        },
-        {
-          scale: isActive.value
-            ? withTiming(1, { duration: HOLD_ITEM_TRANSFORM_DURATION })
-            : itemScale.value,
-        },
-      ],
-    };
-  });
-
-  const animatedPortalProps = useAnimatedProps<ViewProps>(() => ({
-    pointerEvents: isActive.value ? 'box-none' : 'none',
-  }));
-
-  const portalContainerStyle = useMemo(
-    () => [styles.holdItem, animatedPortalStyle],
-    [animatedPortalStyle]
-  );
-
-  const onMenuLayout = useCallback((e: LayoutChangeEvent) => {
-    const { height, width } = e.nativeEvent.layout;
-    menuHeight.value = height;
-    menuWidth.value = width;
-  }, []);
-
-  return (
-    <View style={_styles.portalWrapper}>
-      <Portal key={key} name={key}>
-        <Animated.View
-          key={key}
-          style={portalContainerStyle}
-          animatedProps={animatedPortalProps}
-        >
-          {children}
-        </Animated.View>
-        <Menu
-          currentId={currentId}
-          name={name}
-          itemRectX={itemRectX}
-          itemRectY={itemRectY}
-          itemRectHeight={itemRectHeight}
-          itemRectWidth={itemRectWidth}
-          menuHeight={menuHeight}
-          menuWidth={menuWidth}
-          calculateTransformValue={calculateTransformValue}
-          menuAnchorPosition={menuAnchorPosition || 'top-left'}
-        >
-          <View style={_styles.outside} pointerEvents={'box-none'}>
-            <Animated.View onLayout={onMenuLayout}>{MenuElement}</Animated.View>
-          </View>
-        </Menu>
-        <Backdrop
-          backdropOpacity={backdropOpacity}
-          currentId={currentId}
-          name={name}
-        />
-      </Portal>
-    </View>
-  );
-});
 
 export const HoldItemModal = memo(function HoldItemModal(
   props: HoldItemModalProps
@@ -374,22 +255,9 @@ export const HoldItemModal = memo(function HoldItemModal(
   );
 
   return mounted ? (
-    <_HoldItemModal
+    <HoldItemPortal
       {...props}
       calculateTransformValue={calculateTransformValue}
     />
   ) : null;
-});
-
-const _styles = StyleSheet.create({
-  outside: {
-    height: 0.001,
-    width: 0.001,
-    backgroundColor: 'blue',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  portalWrapper: {
-    position: 'absolute',
-  },
 });
