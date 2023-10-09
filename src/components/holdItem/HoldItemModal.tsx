@@ -340,6 +340,7 @@ export const HoldItemModal = memo(function HoldItemModal(
     currentId => {
       if (currentId === undefined) {
         visible.value = false;
+        activeId.value = undefined;
       }
     },
     []

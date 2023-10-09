@@ -68,16 +68,6 @@ const HoldItemComponent = ({
 
   //#region animated effects
   useAnimatedReaction(
-    () => currentId.value,
-    currentId => {
-      if (currentId === undefined) {
-        activeId.value = undefined;
-      }
-    },
-    []
-  );
-  //#endregion
-  useAnimatedReaction(
     () => activeId.value,
     activeId => {
       if (activeId === name) {
