@@ -14,20 +14,20 @@ import {
 } from '../../constants';
 import { LayoutChangeEvent, StyleSheet, View, ViewProps } from 'react-native';
 import styles from './styles';
-import { Portal } from '@gorhom/portal';
+import { Portal, PortalHost } from "@gorhom/portal";
 import Menu from '../menu';
 import { Backdrop } from '../backdrop';
 import { HoldItemModalProps } from 'react-native-hold-menu';
 
 export const HoldItemPortal = memo(function _HoldItemPortal({
-  name,
-  children,
-  disableMove,
-  menuAnchorPosition,
-  MenuElement,
-  backdropOpacity,
-  calculateTransformValue,
-}: HoldItemModalProps & { calculateTransformValue: () => number }) {
+                                                              name,
+                                                              children,
+                                                              disableMove,
+                                                              menuAnchorPosition,
+                                                              MenuElement,
+                                                              backdropOpacity,
+                                                              calculateTransformValue,
+                                                            }: HoldItemModalProps & { calculateTransformValue: () => number }) {
   const {
     currentId,
     itemRectY,
@@ -51,8 +51,10 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
       disableMove
         ? 0
         : isActive.value
-        ? withSpring(tY, SPRING_CONFIGURATION)
-        : withTiming(-0.1, { duration: HOLD_ITEM_TRANSFORM_DURATION });
+          ? withSpring(tY, SPRING_CONFIGURATION)
+          : withTiming(-0.1, { duration: HOLD_ITEM_TRANSFORM_DURATION });
+
+    // console.log(itemRectY.value, itemRectX.value, itemRectWidth.value, itemRectHeight.value, tY);
 
     return {
       zIndex: 10,
@@ -98,7 +100,9 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
           style={portalContainerStyle}
           animatedProps={animatedPortalProps}
         >
-          {children}
+          {children || (
+            <PortalHost name={"hold-menu-item"+name}/>
+          )}
         </Animated.View>
         <Menu
           currentId={currentId}

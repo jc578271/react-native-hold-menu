@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { forwardRef, memo } from 'react';
 import Animated, {
   measure,
   useAnimatedReaction,
@@ -13,15 +13,14 @@ import { HOLD_ITEM_TRANSFORM_DURATION } from '../../constants';
 import type { HoldItemProps } from './types';
 import { useInternal } from '../../hooks';
 import { HoldItemModal, HoldItemModalProps } from './HoldItemModal';
+import { Portal } from '@gorhom/portal';
 //#endregion
 
-const HoldItemComponent = ({
-  children,
-  name,
-  style,
-  ...modalProps
-}: HoldItemProps & Partial<HoldItemModalProps>) => {
-  const { visible, MenuElement } = modalProps;
+const HoldItemComponent = forwardRef<
+  HoldItemModal,
+  HoldItemProps & Partial<HoldItemModalProps>
+>(({ children, name, style, ...modalProps }, ref) => {
+  const { MenuElement } = modalProps;
 
   //#region hooks
   const {
@@ -90,11 +89,12 @@ const HoldItemComponent = ({
   return (
     <Animated.View ref={containerRef} style={containerStyle}>
       {children}
-      {visible && MenuElement ? (
+      <Portal hostName={'hold-menu-item' + name}>{children}</Portal>
+      {MenuElement ? (
         <HoldItemModal
+          ref={ref}
           {...modalProps}
           name={name}
-          visible={visible}
           MenuElement={MenuElement}
         >
           {children}
@@ -103,6 +103,6 @@ const HoldItemComponent = ({
     </Animated.View>
   );
   //#endregion
-};
+});
 
 export const HoldItem = memo(HoldItemComponent);
