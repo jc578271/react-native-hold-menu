@@ -14,7 +14,7 @@ import {
 } from '../../constants';
 import { LayoutChangeEvent, StyleSheet, View, ViewProps } from 'react-native';
 import styles from './styles';
-import { Portal, PortalHost } from '@gorhom/portal';
+import { PortalHost } from '@gorhom/portal';
 import Menu from '../menu';
 import { Backdrop } from '../backdrop';
 import { HoldItemModalProps } from 'react-native-hold-menu';
@@ -27,14 +27,8 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
   MenuElement,
   backdropOpacity,
   calculateTransformValue,
-  handleOnMount,
-  handleOnUpdate,
-  handleOnUnmount,
 }: HoldItemModalProps & {
   calculateTransformValue: () => number;
-  handleOnMount?: (mount: () => void) => void;
-  handleOnUnmount?: (unmount: () => void) => void;
-  handleOnUpdate?: (update: () => void) => void;
 }) {
   const {
     currentId,
@@ -99,44 +93,36 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
   }, []);
 
   return (
-    <View style={_styles.portalWrapper}>
-      <Portal
-        handleOnMount={handleOnMount}
-        handleOnUnmount={handleOnUnmount}
-        handleOnUpdate={handleOnUpdate}
+    <>
+      <Animated.View
         key={'hold-menu-modal' + name}
-        name={'hold-menu-modal' + name}
+        style={portalContainerStyle}
+        animatedProps={animatedPortalProps}
       >
-        <Animated.View
-          key={'hold-menu-modal' + name}
-          style={portalContainerStyle}
-          animatedProps={animatedPortalProps}
-        >
-          {children || <PortalHost name={'hold-menu-item' + name} />}
-        </Animated.View>
-        <Menu
-          currentId={currentId}
-          name={name}
-          itemRectX={itemRectX}
-          itemRectY={itemRectY}
-          itemRectHeight={itemRectHeight}
-          itemRectWidth={itemRectWidth}
-          menuHeight={menuHeight}
-          menuWidth={menuWidth}
-          calculateTransformValue={calculateTransformValue}
-          menuAnchorPosition={menuAnchorPosition || 'top-left'}
-        >
-          <View style={_styles.outside} pointerEvents={'box-none'}>
-            <Animated.View onLayout={onMenuLayout}>{MenuElement}</Animated.View>
-          </View>
-        </Menu>
-        <Backdrop
-          backdropOpacity={backdropOpacity}
-          currentId={currentId}
-          name={name}
-        />
-      </Portal>
-    </View>
+        {children || <PortalHost name={'hold-menu-item' + name} />}
+      </Animated.View>
+      <Menu
+        currentId={currentId}
+        name={name}
+        itemRectX={itemRectX}
+        itemRectY={itemRectY}
+        itemRectHeight={itemRectHeight}
+        itemRectWidth={itemRectWidth}
+        menuHeight={menuHeight}
+        menuWidth={menuWidth}
+        calculateTransformValue={calculateTransformValue}
+        menuAnchorPosition={menuAnchorPosition || 'top-left'}
+      >
+        <View style={_styles.outside} pointerEvents={'box-none'}>
+          <Animated.View onLayout={onMenuLayout}>{MenuElement}</Animated.View>
+        </View>
+      </Menu>
+      <Backdrop
+        backdropOpacity={backdropOpacity}
+        currentId={currentId}
+        name={name}
+      />
+    </>
   );
 });
 

@@ -29,7 +29,8 @@ import {
 } from '../../utils/calculations';
 import styleGuide from '../../styleGuide';
 import { HoldItemPortal } from './portal';
-import { InteractionManager } from 'react-native';
+import { InteractionManager, StyleSheet, View } from 'react-native';
+import { Portal } from '@gorhom/portal';
 
 export interface HoldItemModalProps {
   name: string;
@@ -56,14 +57,10 @@ export interface HoldItemModal {
 }
 
 const _HoldItemModal = memo(
-  forwardRef<
-    HoldItemModal,
-    HoldItemModalProps & {
-      handleOnMount?: (mount: () => void) => void;
-      handleOnUnmount?: (unmount: () => void) => void;
-      handleOnUpdate?: (update: () => void) => void;
-    }
-  >(function _HoldItemModal(props, ref) {
+  forwardRef<HoldItemModal, HoldItemModalProps>(function _HoldItemModal(
+    props,
+    ref
+  ) {
     const {
       name,
       disableMove,
@@ -240,7 +237,7 @@ export const HoldItemModal = memo(
     props,
     ref
   ) {
-    const { onDismiss } = props;
+    const { onDismiss, name } = props;
     const { activeId, currentId } = useInternal();
     const _ref = useRef<HoldItemModal>(null);
 
@@ -291,7 +288,7 @@ export const HoldItemModal = memo(
     const dismiss = useCallback(() => {
       _ref.current?.dismiss();
       InteractionManager.runAfterInteractions(() => unmount());
-    }, [unmount]);
+    }, [unmount, _ref.current?.dismiss]);
 
     useImperativeHandle(ref, () => ({
       present,
@@ -317,6 +314,7 @@ export const HoldItemModal = memo(
 
     /* ------- HANDLE PORTAL ----------*/
     const handlePortalOnUnmount = useCallback(function handlePortalOnUnmount() {
+      // dismiss();
       mounted.current = false;
     }, []);
 
@@ -330,13 +328,23 @@ export const HoldItemModal = memo(
     []);
 
     return mount ? (
-      <_HoldItemModal
-        {...props}
-        ref={_ref}
-        handleOnUpdate={handlePortalRender}
-        handleOnMount={handlePortalRender}
-        handleOnUnmount={handlePortalOnUnmount}
-      />
+      <View style={_styles.portalWrapper}>
+        <Portal
+          key={'hold-menu-modal' + name}
+          name={'hold-menu-modal' + name}
+          handleOnMount={handlePortalRender}
+          handleOnUpdate={handlePortalRender}
+          handleOnUnmount={handlePortalOnUnmount}
+        >
+          <_HoldItemModal ref={_ref} {...props} />
+        </Portal>
+      </View>
     ) : null;
   })
 );
+
+const _styles = StyleSheet.create({
+  portalWrapper: {
+    position: 'absolute',
+  },
+});
