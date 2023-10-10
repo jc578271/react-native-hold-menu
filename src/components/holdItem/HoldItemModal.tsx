@@ -30,7 +30,7 @@ import {
 import styleGuide from '../../styleGuide';
 import { HoldItemPortal } from './portal';
 import { InteractionManager, StyleSheet, View } from 'react-native';
-import { Portal } from '@gorhom/portal';
+import { Portal, usePortal } from '@gorhom/portal';
 
 export interface HoldItemModalProps {
   name: string;
@@ -267,13 +267,16 @@ export const HoldItemModal = memo(
       [resetVariables, onDismiss]
     );
 
+    const { removePortal } = usePortal();
+
     const jsUnmount = useCallback(() => {
       InteractionManager.runAfterInteractions(() => {
         setTimeout(() => {
+          removePortal('hold-menu-modal' + name);
           unmount();
-        }, HOLD_ITEM_TRANSFORM_DURATION + 100);
+        }, HOLD_ITEM_TRANSFORM_DURATION + 50);
       });
-    }, [unmount]);
+    }, [unmount, name]);
 
     /* ------- PUBLIC METHOD ----------*/
     const present = useCallback(
