@@ -274,7 +274,7 @@ export const HoldItemModal = memo(
         setTimeout(() => {
           removePortal('hold-menu-modal' + name);
           unmount();
-        }, HOLD_ITEM_TRANSFORM_DURATION + 50);
+        }, HOLD_ITEM_TRANSFORM_DURATION + 100);
       });
     }, [unmount, name]);
 
