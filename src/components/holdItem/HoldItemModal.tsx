@@ -313,10 +313,15 @@ export const HoldItemModal = memo(
     );
 
     /* ------- HANDLE PORTAL ----------*/
-    const handlePortalOnUnmount = useCallback(function handlePortalOnUnmount() {
-      // dismiss();
-      mounted.current = false;
-    }, []);
+    const handlePortalOnUnmount = useCallback(
+      function handlePortalOnUnmount() {
+        if (mounted.current) {
+          dismiss();
+        }
+        mounted.current = false;
+      },
+      [dismiss]
+    );
 
     const handlePortalRender = useCallback(function handlePortalRender(
       render: () => void

@@ -134,7 +134,4 @@ const _styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  portalWrapper: {
-    position: 'absolute',
-  },
 });
