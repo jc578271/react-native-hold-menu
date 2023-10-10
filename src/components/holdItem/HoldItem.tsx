@@ -53,7 +53,9 @@ const HoldItemComponent = forwardRef<
         {
           scale: isActive.value
             ? withTiming(1, { duration: HOLD_ITEM_TRANSFORM_DURATION })
-            : itemScale.value,
+            : activeId.value === name
+            ? itemScale.value
+            : 1,
         },
       ],
     };
