@@ -66,7 +66,7 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
         },
       ],
     };
-  }, [calculateTransformValue]);
+  }, []);
 
   return (
     <Animated.View style={[styles.menuWrapper, wrapperStyles]}>
