@@ -259,27 +259,27 @@ export const HoldItemModal = memo(
 
         // unmount the node, if sheet is still mounted
         if (_mounted) {
-          InteractionManager.runAfterInteractions(() =>
-            setTimeout(() => {
-              setMount(false);
-            }, HOLD_ITEM_TRANSFORM_DURATION + 50)
-          );
+          setMount(false);
         }
-        InteractionManager.runAfterInteractions(() => {
-          setTimeout(() => {
-            onDismiss?.();
-          }, HOLD_ITEM_TRANSFORM_DURATION + 50);
-        });
+        onDismiss?.();
       },
       [resetVariables, onDismiss]
     );
+
+    const jsUnmount = useCallback(() => {
+      InteractionManager.runAfterInteractions(() => {
+        setTimeout(() => {
+          unmount();
+        }, HOLD_ITEM_TRANSFORM_DURATION + 100);
+      });
+    }, [unmount]);
 
     /* ------- PUBLIC METHOD ----------*/
     const present = useCallback(
       (isTap?: boolean) => {
         setMount(true);
         InteractionManager.runAfterInteractions(() =>
-          _ref.current?.present(isTap)
+          setTimeout(() => _ref.current?.present(isTap), 50)
         );
       },
       [_ref.current?.present]
@@ -287,8 +287,8 @@ export const HoldItemModal = memo(
 
     const dismiss = useCallback(() => {
       _ref.current?.dismiss();
-      InteractionManager.runAfterInteractions(() => unmount());
-    }, [unmount, _ref.current?.dismiss]);
+      jsUnmount();
+    }, [jsUnmount, _ref.current?.dismiss]);
 
     useImperativeHandle(ref, () => ({
       present,
@@ -296,9 +296,6 @@ export const HoldItemModal = memo(
     }));
 
     /* ---------ON UNMOUNT WHEN CURRENT ID IS UNDEFINED---------------*/
-    const jsUnmount = useCallback(() => {
-      InteractionManager.runAfterInteractions(() => unmount());
-    }, [unmount]);
 
     useAnimatedReaction(
       () => currentId.value,
@@ -309,7 +306,7 @@ export const HoldItemModal = memo(
           runOnJS(jsUnmount)();
         }
       },
-      [unmount]
+      [jsUnmount]
     );
 
     /* ------- HANDLE PORTAL ----------*/
