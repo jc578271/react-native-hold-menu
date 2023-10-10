@@ -75,7 +75,7 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
         },
       ],
     };
-  }, [calculateTransformValue]);
+  }, []);
 
   const animatedPortalProps = useAnimatedProps<ViewProps>(() => ({
     pointerEvents: isActive.value ? 'box-none' : 'none',
