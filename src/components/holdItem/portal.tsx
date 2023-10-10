@@ -27,6 +27,8 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
   MenuElement,
   backdropOpacity,
   calculateTransformValue,
+  safeAreaInsets,
+  isFullScreenMenu,
 }: HoldItemModalProps & {
   calculateTransformValue: () => number;
 }) {
@@ -42,7 +44,6 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
   } = useInternal();
 
   const isActive = useDerivedValue(() => currentId.value === name);
-
   /* -------------------- STYLE ------------------------- */
   const animatedPortalStyle = useAnimatedStyle(() => {
     const animateOpacity = () =>
@@ -112,6 +113,8 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
         menuWidth={menuWidth}
         calculateTransformValue={calculateTransformValue}
         menuAnchorPosition={menuAnchorPosition || 'top-left'}
+        safeAreaInsets={safeAreaInsets}
+        isFullScreenMenu={isFullScreenMenu}
       >
         <View style={_styles.outside} pointerEvents={'box-none'}>
           <Animated.View onLayout={onMenuLayout}>{MenuElement}</Animated.View>
@@ -128,10 +131,8 @@ export const HoldItemPortal = memo(function _HoldItemPortal({
 
 const _styles = StyleSheet.create({
   outside: {
-    height: 0.001,
-    width: 0.001,
-    backgroundColor: 'blue',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'scroll',
   },
 });

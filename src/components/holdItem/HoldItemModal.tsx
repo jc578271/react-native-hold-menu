@@ -49,6 +49,7 @@ export interface HoldItemModalProps {
     left: number;
   };
   onDismiss?: () => void;
+  isFullScreenMenu?: boolean;
 }
 
 export interface HoldItemModal {

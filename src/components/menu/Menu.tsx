@@ -13,8 +13,11 @@ import styles from './styles';
 import {
   HOLD_ITEM_TRANSFORM_DURATION,
   SPRING_CONFIGURATION,
+  WINDOW_HEIGHT,
+  WINDOW_WIDTH,
 } from '../../constants';
 import { TransformOriginAnchorPosition } from '../../utils/calculations';
+import { useDeviceOrientation } from '../../hooks';
 
 export interface MenuProps {
   name: string;
@@ -28,6 +31,13 @@ export interface MenuProps {
   menuHeight: SharedValue<number>;
   menuWidth: SharedValue<number>;
   calculateTransformValue: () => number;
+  safeAreaInsets?: {
+    top: number;
+    right: number;
+    bottom: number;
+    left: number;
+  };
+  isFullScreenMenu?: boolean;
 }
 
 const MenuComponent = ({ children, ...rest }: MenuProps) => {
@@ -40,17 +50,23 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
     itemRectHeight,
     itemRectWidth,
     calculateTransformValue,
+    isFullScreenMenu,
   } = rest;
+
+  const deviceOrientation = useDeviceOrientation();
 
   const wrapperStyles = useAnimatedStyle(() => {
     const anchorPositionVertical = menuAnchorPosition.split('-')[0];
+
+    const windowWidth =
+      deviceOrientation === 'portrait' ? WINDOW_WIDTH : WINDOW_HEIGHT;
 
     const top =
       anchorPositionVertical === 'top'
         ? itemRectHeight.value + itemRectY.value + 8
         : itemRectY.value - 8;
-    const left = itemRectX.value;
-    const width = itemRectWidth.value;
+    const left = isFullScreenMenu ? 0 : itemRectX.value;
+    const width = isFullScreenMenu ? windowWidth : itemRectWidth.value;
     const tY = calculateTransformValue();
 
     return {
@@ -66,7 +82,7 @@ const MenuComponent = ({ children, ...rest }: MenuProps) => {
         },
       ],
     };
-  }, []);
+  }, [deviceOrientation, isFullScreenMenu]);
 
   return (
     <Animated.View style={[styles.menuWrapper, wrapperStyles]}>

@@ -18,10 +18,10 @@ export const leftOrRight = (
 
   let leftPosition = 0;
   anchorPositionHorizontal === 'right'
-    ? (leftPosition = -menuWidth + itemWidth)
+    ? (leftPosition = itemWidth - menuWidth)
     : anchorPositionHorizontal === 'left'
     ? (leftPosition = 0)
-    : (leftPosition = -itemWidth - menuWidth / 2 + itemWidth / 2);
+    : (leftPosition = itemWidth / 2 - menuWidth / 2);
 
   return leftPosition;
 };
