@@ -78,7 +78,7 @@ const BackdropComponent = ({
       top: topValueAnimation(),
       opacity: opacityValueAnimation(),
     };
-  });
+  }, []);
 
   const backdropStyle = useMemo(
     () => ({
