@@ -270,6 +270,8 @@ export const HoldItemModal = memo(
     const { removePortal } = usePortal();
 
     const jsUnmount = useCallback(() => {
+      currentId.value = undefined;
+      activeId.value = undefined;
       InteractionManager.runAfterInteractions(() => {
         setTimeout(() => {
           removePortal('hold-menu-modal' + name);
