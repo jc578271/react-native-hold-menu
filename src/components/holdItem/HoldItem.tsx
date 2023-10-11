@@ -19,7 +19,7 @@ import { Portal } from '@gorhom/portal';
 const HoldItemComponent = forwardRef<
   HoldItemModal,
   HoldItemProps & Partial<HoldItemModalProps>
->(({ children, name, style, ...modalProps }, ref) => {
+>(({ children, name, style, isVisibleWhenShown, ...modalProps }, ref) => {
   const { MenuElement } = modalProps;
 
   //#region hooks
@@ -48,7 +48,7 @@ const HoldItemComponent = forwardRef<
       withDelay(HOLD_ITEM_TRANSFORM_DURATION, withTiming(1, { duration: 0 }));
 
     return {
-      opacity: isActive.value ? 0 : animateOpacity(),
+      opacity: isVisibleWhenShown ? 1 : isActive.value ? 0 : animateOpacity(),
       transform: [
         {
           scale: isActive.value

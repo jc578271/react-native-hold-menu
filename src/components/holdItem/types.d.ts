@@ -6,6 +6,7 @@ export type HoldItemProps = {
   name: string;
   children: React.ReactElement | React.ReactElement[];
   style?: ViewStyle | ViewStyle[];
+  isVisibleWhenShown?: boolean;
 };
 
 export type GestureHandlerProps = {
