@@ -83,7 +83,7 @@ const BackdropComponent = ({
   const backdropStyle = useMemo(
     () => ({
       backgroundColor: 'black',
-      opacity: backdropOpacity || 0.7,
+      opacity: backdropOpacity !== undefined ? backdropOpacity : 0.7,
     }),
     [backdropOpacity]
   );
